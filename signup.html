@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="img/icon.png">
+  <title>Cadastro - Guardian</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header>
+    <div class="navbar">
+      <div class="logo"><img src="img/logo.png"></div>
+      <div class="menu-icon" id="menu-icon">&#9776;</div>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="relatorios.html">Relatórios</a></li>
+        <li><a href="#sobre">Sobre</a></li>
+        <li><a href="login.html">Login</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="form-container">
+    <h2>Criar Conta</h2>
+    <form id="signupForm">
+      <label for="email">Email:</label>
+      <input type="email" id="email" required>
+      <label for="name">Nome:</label>
+      <input type="text" id="displayName" required>
+      <label for="password">Senha:</label>
+      <input type="password" id="password" required>
+      <label for="confirmPassword">Confirmar Senha:</label>
+      <input type="password" id="confirmPassword" required>
+
+      <button type="submit">Cadastrar</button>
+    </form>
+    <p>Já tem uma conta? <a href="login.html">Faça login</a></p>
+    <div id="signupError"></div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+  <script src="firebase-config.js"></script>
+  <script src="app.js"></script> <!-- Certifique-se de que o app.js está carregando -->
+
+  <script>
+
+    // Função para cadastrar usuário
+    document.getElementById('signupForm').addEventListener('submit', function (event) {
+      event.preventDefault(); // Previne o envio padrão do formulário
+
+      var name = document.getElementById('displayName').value;
+      var email = document.getElementById('email').value;
+      var password = document.getElementById('password').value;
+      var confirmPassword = document.getElementById('confirmPassword').value;
+
+      var errorDiv = document.getElementById('signupError');
+      errorDiv.textContent = ''; // Limpa mensagens de erro
+
+      // Verifica se as senhas são iguais
+      if (password !== confirmPassword) {
+        errorDiv.textContent = 'As senhas não coincidem. Por favor, tente novamente.';
+        return;
+      }
+
+      // Cria o usuário no Firebase
+      firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+          var user = userCredential.user;
+
+          // Atualiza o perfil do usuário com o nome
+          return user.updateProfile({
+            displayName: name
+          }).then(() => {
+            alert('Conta criada com sucesso!');
+            window.location.href = 'login.html'; // Redireciona para a página de login
+          });
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+
+          if (errorCode === 'auth/email-already-in-use') {
+            errorDiv.textContent = 'Este e-mail já está em uso.';
+          } else if (errorCode === 'auth/weak-password') {
+            errorDiv.textContent = 'A senha é muito fraca. Tente usar uma senha mais forte.';
+          } else {
+            errorDiv.textContent = 'Erro: ' + errorMessage;
+          }
+        });
+    });
+  </script>
+</body>
+
+</html>

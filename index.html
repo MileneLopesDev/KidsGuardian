@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="img/icon.png">
+    <title>Relatórios de Uso da Internet</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+
+        <div class="navbar">
+
+            <div class="logo"><img src="img/logo.png"></div>
+            <div class="menu-icon" id="menu-icon">&#9776;</div>
+            <ul class="nav-links" id="nav-links">
+
+                <li><a href="index.html">Início</a></li>
+                <li><a href="relatorios.html">Relatórios</a></li>
+                <li><a href="#sobre">Sobre</a></li>
+                <li id="user-nav"></li>
+            </ul>
+        </div>
+    </header>
+
+    <section class="slides">
+        <div class="list">
+            <div class="item active">
+                <div class="kid-img">
+                    <img src="./img/bebe.png">
+                </div>
+                <div class="content">
+                    <h2 class="titulo-list">De 0 a 2 anos</h2>
+                    <p class="desc">A Sociedade Brasileira de Pediatria (SBP) recomenda que não sejam expostas a telas.
+                    </p>
+                    <button class="bnt-item">Saiba mais sobre essa idade</button>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="kid-img">
+                    <img src="./img/crianca1.png">
+                </div>
+                <div class="content">
+                    <h2 class="titulo-list">De 2 a 5 anos</h2>
+                    <p class="desc">O tempo de tela deve ser limitado a uma hora por dia, sempre com supervisão de um
+                        adulto.</p>
+                    <button class="bnt-item">Saiba mais sobre essa idade</button>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="kid-img">
+                    <img src="./img/crianca2.png">
+                </div>
+                <div class="content">
+                    <h2 class="titulo-list">De 6 a 10 anos</h2>
+                    <p class="desc">O tempo de tela deve ser limitado a uma ou duas horas por dia, também com
+                        supervisão.</p>
+                    <button class="bnt-item">Saiba mais sobre essa idade</button>
+                </div>
+            </div>
+
+            <div class="item">
+                <div class="kid-img">
+                    <img src="./img/adolescente.png">
+                </div>
+                <div class="content">
+                    <h2 class="titulo-list">De 11 a 18 anos</h2>
+                    <p class="desc">Não devem ultrapassar o tempo limite de três horas de tela por dia, incluindo o uso
+                        de videogames.</p>
+                    <button class="bnt-item">Saiba mais sobre essa idade</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="arrows">
+            <button id="prev"><img src="img/seta.svg" alt="seta esquerda"></button>
+            <button id="next"><img src="img/seta.svg" alt="seta direita"></button>
+        </div>
+
+        <div class="indicators">
+            <div class="number">01</div>
+            <ul>
+                <li class="active"></li>
+                <li></li>
+                <li></li>
+                <li></li>
+            </ul>
+        </div>
+    </section>
+
+    <div class="form-container">
+        <h2>Busca pela idade da criança</h2>
+        <label for="idade">Insira a idade da criança:</label>
+        <input type="number" id="idade" name="idade" min="1" max="18">
+        <button id="buscarRelatorio">Buscar Relatórios</button>
+        <div id="resultado"></div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Guardian. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script> <!-- Para autenticação -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script> <!-- Para Firestore -->
+    <script src="firebase-config.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>

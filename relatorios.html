@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="img/icon.png">
+    <title>Relatórios - Guardian</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="navbar">
+            <div class="logo"><img src="img/logo.png"></div>
+            <div class="menu-icon" id="menu-icon">&#9776;</div>
+            <ul class="nav-links" id="nav-links">
+                <li><a href="index.html">Início</a></li>
+                <li><a href="relatorios.html">Relatórios</a></li>
+                <li><a href="#sobre">Sobre</a></li>
+                <li id="user-nav"></li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Todos os Relatórios</h1>
+        <div id="resultado"></div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Guardian. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script> <!-- Para autenticação -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script> <!-- Para Firestore -->
+    <script src="firebase-config.js"></script>
+    <script src="app.js"></script>
+    <script>
+
+
+
+        // Carregar relatórios ao abrir a página
+        window.onload = carregarRelatorios;
+
+        console.log('Firestore DB:', db);
+
+    </script>
+</body>
+
+</html>

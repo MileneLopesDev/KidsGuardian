@@ -1,0 +1,566 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  list-style: none;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.6;
+  background-color: #07aab0;
+  color: #333;
+  overflow-x: hidden;
+}
+
+
+/* Estilo do Cabeçalho e Navegação */
+header {
+  background-color: #07aab0;
+  /* Cor do cabeçalho */
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 80%;
+  margin: auto;
+}
+
+.logo {
+  & img {
+    width: 250px;
+  }
+
+  font-size: 1.8rem;
+  color: #fff;
+  font-weight: bold;
+}
+
+.menu-icon {
+  display: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #fff;
+  /* Cor do ícone do menu */
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+}
+
+.nav-links li {
+  margin-left: 20px;
+}
+
+.nav-links a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 10px 15px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-links a:hover {
+  background-color: #ee427f;
+  color: #fff;
+  border-radius: 5px;
+}
+
+/* Itens index*/
+/* Ajustando o z-index para a seção */
+section {
+  background-image: radial-gradient(#f9ab77, #07aab0);
+  height: 100vh;
+  position: relative;
+  z-index: 1;
+  /* Garantindo que a section esteja acima do fundo */
+
+  & .list {
+    width: 100vw;
+    margin: auto;
+    height: 90%;
+    position: relative;
+    z-index: 2;
+    /* A lista estará acima da section */
+
+    & .item {
+      position: absolute;
+      inset: 0;
+      top: -50px;
+      z-index: 3;
+      /* Os itens estarão acima da lista */
+
+      & .kid-img {
+        position: absolute;
+        width: 100%;
+        z-index: 3;
+
+        /* A imagem da criança estará acima do item */
+        & img {
+          width: 40%;
+          position: relative;
+          left: 10%;
+        }
+      }
+
+      & .content {
+        top: -130px;
+        left: 10%;
+        position: absolute;
+        width: 70%;
+        height: 100%;
+        right: 110px;
+        display: flex;
+        flex-direction: column;
+        justify-content: end;
+        align-items: flex-end;
+        gap: 20px;
+        z-index: 4;
+        /* O conteúdo estará acima da imagem */
+
+        & .titulo-list {
+          font-weight: bold;
+          font-size: 4em;
+          color: #fff;
+          z-index: 5;
+          /* O título estará acima de tudo no item */
+        }
+
+        & .desc {
+          font-size: 1.5em;
+          text-align: right;
+          max-width: 400px;
+          z-index: 5;
+          /* A descrição também estará acima do item */
+        }
+
+        & .bnt-item {
+          font-size: larger;
+          background-color: coral;
+          height: 40px;
+          width: 300px;
+          cursor: pointer;
+          z-index: 6;
+          position: relative;
+          display: block;
+          border: none;
+        }
+      }
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      height: 50px;
+      width: 76%;
+      margin-left: 10%;
+      top: 39%;
+      border-top: 2px solid #fff;
+    }
+  }
+
+  & .indicators {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 200px;
+    width: 90vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: end;
+    gap: 15px;
+    z-index: 2;
+
+    & .number {
+      font-size: 3em;
+      color: #fff;
+    }
+
+    & ul {
+      display: flex;
+      gap: 10px;
+
+      & li {
+        width: 50px;
+        height: 5px;
+        background-color: salmon;
+        border-radius: 5px;
+        transition: 0.5s;
+      }
+
+      & .active {
+        background-color: #fff;
+      }
+    }
+  }
+
+  .arrows {
+    width: 80vw;
+    position: absolute;
+    transform: translate(-50%, -50px);
+    top: 40%;
+    left: 50%;
+    display: flex;
+    justify-content: space-between;
+    z-index: 5;
+    /* As setas estarão acima dos outros elementos */
+
+    & button:nth-child(1) {
+      & img {
+        transform: scale(-1);
+        margin-left: -6px;
+      }
+    }
+
+    & button {
+      top: 20%;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      background-color: #f9ab77;
+      z-index: 6;
+
+      & img {
+        width: 30px;
+        margin-top: 1px;
+        cursor: pointer;
+      }
+
+      &:hover {
+        background-color: #ee427f;
+        border-radius: 50%;
+
+      }
+    }
+  }
+}
+
+/* Animações */
+section {
+  & .list {
+    & .item {
+      transform: translateX(100vw);
+      transition: 0.5s;
+      opacity: 0;
+
+      & .kid-img {
+        & img {
+          transition: 0.5s;
+          transition-delay: 0.3s;
+        }
+      }
+
+      & .content {
+
+        & .titulo-list,
+        .desc,
+        .bnt-item {
+          transform: translateX(200px);
+          transition: 0.7s;
+          transition-delay: 0.3s;
+          opacity: 0;
+        }
+
+        & .desc {
+          transition-delay: 0.5s;
+        }
+
+        & .bnt-item {
+          transition-delay: 0.7s;
+        }
+      }
+    }
+
+    & .active {
+      transform: translateX(0);
+      transition: 0.5s;
+      opacity: 1;
+
+      & .content {
+
+        & .titulo-list,
+        .desc,
+        .bnt-item {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+    }
+  }
+}
+
+/* Container para o conteúdo */
+.container {
+  max-width: 800px;
+  margin: 20px auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Alinhar títulos e subtítulos ao centro */
+.container h1,
+.container h2,
+.container h3 {
+  text-align: center;
+}
+
+/* Alinhar parágrafos (texto normal) à esquerda */
+.container p {
+  text-align: left;
+}
+
+
+/* Estilo para o nome do usuário e dropdown */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+
+
+.user-name {
+  color: #fff;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 10px 15px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.user-name:hover {
+  background-color: #ff6200;
+  border-radius: 5px;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  transition: background-color 0.3s;
+}
+
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+
+/* Estilos para responsividade */
+@media (max-width: 600px) {
+  .nav-links {
+    display: none;
+    /* Ocultar links por padrão */
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    /* Abaixo da navbar */
+    left: 0;
+    background: #005eb8;
+    width: 100%;
+  }
+
+  .nav-links.show {
+    display: flex;
+    /* Mostrar links quando ativo */
+  }
+
+  .menu-icon {
+    display: block;
+    /* Mostrar ícone de menu */
+  }
+}
+
+
+#resultado {
+  margin-top: 20px;
+}
+
+.relatorio {
+  background: #f9f9f9;
+  /* Cor de fundo suave */
+  border: 1px solid #ddd;
+  /* Bordas sutis */
+  border-radius: 5px;
+  padding: 15px;
+  margin: 10px 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.relatorio:hover {
+  transform: translateY(-2px);
+  /* Efeito de levantar ao passar o mouse */
+}
+
+.relatorio h3 {
+  margin: 0 0 10px;
+  color: #ee427f;
+  /* Cor do título */
+}
+
+.relatorio p {
+  margin: 5px 0;
+}
+
+
+button {
+  background-color: #f9ab77;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #ee427f;
+}
+
+footer {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.9em;
+}
+
+@media (max-width: 600px) {
+  .navbar ul {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .navbar ul li {
+    margin: 10px 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+#resultado p {
+  animation: fadeIn 0.5s;
+}
+
+/* Estilos para o formulário */
+.form-container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.form-container h2 {
+  margin-bottom: 20px;
+  color: #ee427f;
+  font-size: 24px;
+}
+
+.input-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  font-size: 16px;
+}
+
+
+/* Estilos para as páginas de login e cadastro */
+.form-container {
+  max-width: 400px;
+  margin: 50px auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+input {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+
+
+p {
+  text-align: center;
+  margin-top: 10px;
+}
+
+
+
+
+.message {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .form-container {
+    width: 90%;
+  }
+}
+
+#error {
+  color: #ee427f;
+  text-align: center;
+  margin-top: 10px;
+}
