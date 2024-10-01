@@ -310,6 +310,8 @@ section {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+
 }
 
 /* Alinhar títulos e subtítulos ao centro */
@@ -400,13 +402,21 @@ section {
 
 #resultado {
   margin-top: 20px;
+
+  a:link {
+    color: #07aab0;
+    text-decoration: none;
+  }
+
+  a:visited {
+    color: gray;
+  }
+
 }
 
 .relatorio {
   background: #f9f9f9;
-  /* Cor de fundo suave */
   border: 1px solid #ddd;
-  /* Bordas sutis */
   border-radius: 5px;
   padding: 15px;
   margin: 10px 0;
@@ -422,7 +432,8 @@ section {
 .relatorio h3 {
   margin: 0 0 10px;
   color: #ee427f;
-  /* Cor do título */
+  text-decoration: none;
+
 }
 
 .relatorio p {
