@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="src/styles/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="icon" type="image/png" href="src/images/icon.png">
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <title>KG - Login</title>
+    >
+</head>
+
+<body>
+    <header>
+        <nav id="navbar">
+
+
+            <div class="logo"><img src="src/images/logo.png"></div>
+
+            <ul id="nav_list">
+                <li class="nav-item active">
+                    <a href="index.html">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a href="explorar.html">Explore</a>
+                </li>
+                <li class="nav-item">
+                    <a href="login.html">Login</a>
+                </li>
+            </ul>
+
+
+
+            <button id="mobile_btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </nav>
+        <div id="mobile_menu">
+            <ul id="mobile_nav_list">
+                <li class="nav-item">
+                    <a href="index.html">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a href="explorar.html">Explorar</a>
+                </li>
+                <li class="nav-item">
+                    <a href="login.html">Login</a>
+                </li>
+            </ul>
+
+
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1 id="tituloArtigo"></h1>
+            <img id="imagemArtigo" alt="Imagem do Artigo" style="width:100%; max-width:600px; margin: 20px 0;" />
+            <p id="conteudoArtigo"></p>
+            <p id="dataArtigo"></p>
+            <p><strong>Créditos:</strong> <span id="creditosArtigo"></span></p>
+        </div>
+    </main>
+
+    <footer>
+        <img src="src/images/wave.svg">
+
+        <div id="footer_items">
+            <span id="copyright">
+                &copy 2024 Milene Lopes
+            </span>
+
+        </div>
+
+    </footer>
+
+    <!-- Firebase App SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+
+    <!-- Firebase Firestore SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+
+    <!-- Configuração do Firebase -->
+    <script src="src/javascript/firebase-config.js"></script>
+
+    <!-- Script Principal -->
+    <script src="src/javascript/script.js"></script>
+
+    <script>
+        // Função para carregar detalhes do artigo com base no ID
+        function carregarDetalhesArtigo() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const artigoId = urlParams.get('id');
+
+            if (artigoId) {
+                db.collection("artigos").doc(artigoId).get()
+                    .then((doc) => {
+                        if (doc.exists) {
+                            const artigo = doc.data();
+                            console.log('Dados do Artigo:', artigo);
+
+                            // Preencher os campos do artigo
+                            document.getElementById('tituloArtigo').textContent = artigo.titulo;
+                            document.getElementById('imagemArtigo').src = artigo.imagemURL || 'src/images/default-image.png';
+                            document.getElementById('conteudoArtigo').innerHTML = artigo.conteudo;
+                            document.getElementById('creditosArtigo').textContent = artigo.creditos;
+
+                            // Formatar a data, se existir
+                            if (artigo.data) {
+                                const dataArtigo = artigo.data.toDate();
+                                const dataFormatada = dataArtigo.toLocaleDateString('pt-BR', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                });
+                                document.getElementById('dataArtigo').textContent = `Publicado em: ${dataFormatada}`;
+                            } else {
+                                document.getElementById('dataArtigo').textContent = 'Data não disponível';
+                            }
+                        } else {
+                            document.getElementById('tituloArtigo').textContent = "Artigo não encontrado.";
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao carregar o artigo:", error);
+                        document.getElementById('tituloArtigo').textContent = "Erro ao carregar o artigo.";
+                    });
+            } else {
+                document.getElementById('tituloArtigo').textContent = "ID do artigo não fornecido.";
+            }
+        }
+
+        // Carregar detalhes ao abrir a página
+        window.onload = carregarDetalhesArtigo;
+    </script>
+
+</body>
+
+</html>

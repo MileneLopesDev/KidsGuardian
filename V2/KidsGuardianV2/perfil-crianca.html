@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="src/styles/styles.css">
+    <link rel="icon" type="image/png" href="src/images/icon.png">
+    <title>Perfil da Criança</title>
+</head>
+
+<body>
+    <header>
+        <nav id="navbar">
+            <div class="logo"><img src="src/images/logo.png"></div>
+            <ul id="nav_list">
+                <li class="nav-item active">
+                    <a href="index.html">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a href="explorar.html">Explore</a>
+                </li>
+                <li class="nav-item">
+                    <a href="login.html">Login</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="form-container">
+            <h2>Perfil da Criança</h2>
+            <form id="childProfileForm">
+                <label for="childName">Nome da Criança:</label>
+                <input type="text" id="childName" placeholder="Ex: João" required>
+                
+                <label for="childAge">Idade:</label>
+                <input type="number" id="childAge" placeholder="Ex: 8" min="0" max="18" required>
+
+                <label for="preferences">Preferências (separadas por vírgula):</label>
+                <input type="text" id="preferences" placeholder="Ex: livros, música, jogos educativos">
+
+                <button class="btn-default" type="submit">Salvar Perfil</button>
+            </form>
+            <div id="formMessage"></div>
+        </div>
+    </main>
+
+    <footer>
+        <img src="src/images/wave.svg">
+        <div id="footer_items">
+            <span id="copyright">&copy 2024 Milene Lopes</span>
+        </div>
+    </footer>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="src/javascript/firebase-config.js"></script>
+    <script>
+document.getElementById('childProfileForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    const childName = document.getElementById('childName').value.trim();
+    const childAge = parseInt(document.getElementById('childAge').value.trim());
+    const preferences = document.getElementById('preferences').value.trim().split(',');
+
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            const userId = user.uid;
+            const db = firebase.firestore();
+
+            // Salva no Firestore
+            db.collection('usuarios')
+                .doc(userId)
+                .collection('childrenProfiles')
+                .add({
+                    name: childName,
+                    age: childAge,
+                    preferences: preferences,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                })
+                .then(() => {
+                    document.getElementById('formMessage').textContent = 'Perfil salvo com sucesso!';
+                    document.getElementById('formMessage').style.color = 'green';
+                    document.getElementById('childProfileForm').reset();
+                })
+                .catch((error) => {
+                    console.error('Erro ao salvar o perfil:', error);
+                    document.getElementById('formMessage').textContent = 'Erro ao salvar o perfil.';
+                    document.getElementById('formMessage').style.color = 'red';
+                });
+        } else {
+            alert('Faça login para salvar o perfil.');
+            window.location.href = 'login.html';
+        }
+    });
+});
+
+    </script>
+</body>
+
+</html>

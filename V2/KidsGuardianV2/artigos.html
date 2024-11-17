@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="src/styles/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="icon" type="image/png" href="src/images/icon.png">
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <title>KG - Login</title>
+    >
+</head>
+
+<body>
+    <header>
+        <nav id="navbar">
+
+
+            <div class="logo"><img src="src/images/logo.png"></div>
+
+            <ul id="nav_list">
+                <li class="nav-item active">
+                    <a href="index.html">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a href="explorar.html">Explore</a>
+                </li>
+                <li class="nav-item">
+                    <a href="login.html">Login</a>
+                </li>
+            </ul>
+
+            <button id="mobile_btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </nav>
+        <div id="mobile_menu">
+            <ul id="mobile_nav_list">
+                <li class="nav-item">
+                    <a href="index.html">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a href="explorar.html">Explorar</a>
+                </li>
+                <li class="nav-item">
+                    <a href="login.html">Login</a>
+                </li>
+            </ul>
+
+
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Artigos</h1>
+        <div id="artigosContainer">
+            <!-- Artigos serão adicionados aqui dinamicamente -->
+        </div>
+
+
+    </div>
+
+    <footer>
+        <img src="src/images/wave.svg">
+
+        <div id="footer_items">
+            <span id="copyright">
+                &copy 2024 Milene Lopes
+            </span>
+
+        </div>
+
+    </footer>
+
+    <!-- Firebase App SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+
+    <!-- Firebase Firestore SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+
+    <!-- Configuração do Firebase -->
+    <script src="src/javascript/firebase-config.js"></script>
+
+    <!-- Script Principal -->
+    <script src="src/javascript/script.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="src/styles/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="icon" type="image/png" href="src/images/icon.png">
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <title>Recomendações</title>
+</head>
+
+<body>
+    <header>
+        <nav id="navbar">
+            <div class="logo"><a href="index.html"><img src="src/images/logo.png" alt="Logo"></a></div>
+            <ul id="nav_list">
+                <li class="nav-item"><a href="index.html">Inicio</a></li>
+                <li class="nav-item"><a href="explorar.html">Explore</a></li>
+                <li class="nav-item"><a href="#" id="loginNavItem">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2 class="section-title">Recomendações para Você</h2>
+        <div id="artigosContainer">
+            <!-- Recomendações serão carregadas aqui -->
+        </div>
+   
+    
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Milene Lopes</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script src="src/javascript/firebase-config.js"></script>
+    <script src="src/javascript/recomendacoes.js"></script>
+    <script>
+        firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+        const userId = user.uid;
+        const db = firebase.firestore();
+        const artigosContainer = document.getElementById('artigosContainer');
+
+        // Busca perfis de crianças do usuário
+        db.collection('usuarios')
+            .doc(userId)
+            .collection('childrenProfiles')
+            .get()
+            .then((querySnapshot) => {
+                if (!querySnapshot.empty) {
+                    const ages = [];
+                    querySnapshot.forEach((doc) => {
+                        const childProfile = doc.data();
+                        ages.push(childProfile.age);
+                    });
+
+                    // Filtra artigos pela idade das crianças
+                    db.collection('artigos')
+                        .where('idade', 'array-contains-any', ages)
+                        .get()
+                        .then((articlesSnapshot) => {
+                            if (!articlesSnapshot.empty) {
+                                articlesSnapshot.forEach((doc) => {
+                                    const article = doc.data();
+                                    artigosContainer.innerHTML += `
+                                       <div class="artigo" data-id="${doc.id}">
+                                    <h2>${article.titulo}</h2>
+                                    <p><strong>Idade:</strong> ${article.idade.join(', ')}</p>
+                                    <p>${article.conteudo.substring(0, 150)}...</p>
+                                    <a href="detalhes-artigos.html?id=${doc.id}" class="btn-default">Leia mais</a>
+                                    `;
+                                   
+                                });
+                            } else {
+                                artigosContainer.innerHTML = '<p>Nenhuma recomendação disponível.</p>';
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Erro ao buscar artigos:', error);
+                        });
+                } else {
+                    artigosContainer.innerHTML = '<p>Crie perfis de crianças para receber recomendações.</p>';
+                }
+            })
+            .catch((error) => {
+                console.error('Erro ao carregar perfis de crianças:', error);
+            });
+    } else {
+        alert('Faça login para acessar as recomendações.');
+        window.location.href = 'login.html';
+    }
+});
+
+    </script>
+</body>
+
+</html>

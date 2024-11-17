@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="src/styles/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
+        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="icon" type="image/png" href="src/images/icon.png">
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <title>KG - Login</title>
+    >
+</head>
+
+<body>
+    <header>
+        <nav id="navbar">
+
+
+            <div class="logo"><img src="src/images/logo.png"></div>
+
+            <ul id="nav_list">
+                <li class="nav-item active">
+                    <a href="index.html">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a href="explorar.html">Explore</a>
+                </li>
+                <li class="nav-item">
+                    <a href="login.html">Login</a>
+                </li>
+            </ul>
+
+
+
+            <button id="mobile_btn">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </nav>
+
+        <div id="mobile_menu">
+            <ul id="mobile_nav_list">
+                <li class="nav-item">
+                    <a href="index.html">Inicio</a>
+                </li>
+                <li class="nav-item">
+                    <a href="explorar.html">Explorar</a>
+                </li>
+                <li class="nav-item">
+                    <a href="login.html">Login</a>
+                </li>
+            </ul>
+
+
+        </div>
+    </header>
+
+    <div class="container">
+        <section id="cards">
+            <h2 class="section-title">Artigos</h2>
+            <h3 class="section-subtitle">Saiba mais sobre cada idade</h3>
+
+            <div id="itens">
+                <div class="item">
+
+                    <img src="src/images/bebe.png" class="item-imagem" alt="">
+
+                    <h3 id="item-title">Bebês de 0 a 2 anos</h3>
+
+                    <span class="item-description">A Sociedade Brasileira de Pediatria (SBP) recomenta que não sejam
+                        expostos a telas.</span>
+
+                    <button class="btn-default" data-idade="0-2" id="buscarArtigo">Ver mais sobre essa idade</button>
+                </div>
+
+                <div class="item">
+
+
+                    <img src="src/images/crianca1.png" class="item-imagem" alt="">
+
+                    <h3 id="item-title">De 3 a 5 anos</h3>
+
+                    <span class="item-description">O tempo de tela deve ser limitado a uma hora por dia, sempre com
+                        supervisão de um
+                        adulto.</span>
+
+                    <button class="btn-default" data-idade="3-5" id="buscarArtigo">Ver mais sobre essa idade</button>
+
+                </div>
+
+                <div class="item">
+
+                    <img src="src/images/crianca2.png" class="item-imagem" alt="">
+
+                    <h3 id="item-title">De 6 a 10 anos</h3>
+
+                    <span class="item-description">O tempo de tela deve ser limitado a uma ou duas horas por dia, também
+                        com
+                        supervisão.</span>
+
+                    <button class="btn-default" data-idade="6-10" id="buscarArtigo">Ver mais sobre essa idade</button>
+                </div>
+
+                <div class="item">
+
+                    <img src="src/images/adolescente.png" class="item-imagem" alt="">
+
+                    <h3 id="item-title">De 11 a 18 anos</h3>
+
+                    <span class="item-description">Não devem ultrapassar o tempo limite de três horas de tela por dia,
+                        incluindo o uso
+                        de videogames.</span>
+
+                    <button class="btn-default" data-idade="11-18" id="buscarArtigo">Ver mais sobre essa idade</button>
+                </div>
+
+            </div>
+        </section>
+
+
+    </div>
+
+    <div class="container">
+        <div class="guia-apps">
+            <h2 class="section-title">Aplicativos e Redes Sociais</h2>
+            <h3 class="section-subtitle">Saiba como funciona o controle parental</h3>
+
+
+
+            <a href="https://www.internetmatters.org/pt/parental-controls/social-media/facebook-messenger-privacy-and-security-settings/"
+                class="squad-content" data-wpel-link="internal">
+                <img src="https://www.internetmatters.org/wp-content/uploads/2024/08/FB-messenger-1-1-600x315.png"
+                    alt="Estas são as configurações de privacidade e segurança do Facebook Messenger" width="600"
+                    height="315">
+                <div class="bottom">
+                    <h3 class="block-title">Configurações de privacidade e segurança do Facebook Messenger</h3><i
+                        class="fa-sharp fas fa-chevron-right"></i>
+                </div>
+            </a>
+            <a href="https://www.internetmatters.org/pt/parental-controls/social-media/facebook/" class="squad-content"
+                data-wpel-link="internal">
+                <img src="https://www.internetmatters.org/wp-content/uploads/2024/08/facebook-logo-new-600x315.png"
+                    alt="Estas são as configurações de segurança e privacidade do Facebook" width="600" height="315">
+                <div class="bottom">
+                    <h3 class="block-title">Configurações de segurança e privacidade do Facebook</h3><i
+                        class="fa-sharp fas fa-chevron-right"></i>
+                </div>
+            </a>
+            <a href="https://www.internetmatters.org/pt/parental-controls/social-media/facetime-privacy-and-safety-settings/"
+                class="squad-content" data-wpel-link="internal">
+                <img src="https://www.internetmatters.org/wp-content/uploads/2024/08/FT-600x315.png"
+                    alt="Estas são as configurações de privacidade e segurança do FaceTime" width="600" height="315">
+                <div class="bottom">
+                    <h3 class="block-title">Configurações de privacidade e segurança do FaceTime</h3><i
+                        class="fa-sharp fas fa-chevron-right"></i>
+                </div>
+            </a>
+            <a href="https://www.internetmatters.org/pt/parental-controls/social-media/instagram/" class="squad-content"
+                data-wpel-link="internal">
+                <img src="https://www.internetmatters.org/wp-content/uploads/2024/08/insta-logo-whie-background-600x314.png"
+                    alt="Este é o controle parental do Instagram" width="600" height="315">
+                <div class="bottom">
+                    <h3 class="block-title">Controle dos pais do Instagram</h3><i
+                        class="fa-sharp fas fa-chevron-right"></i>
+                </div>
+            </a>
+            <a href="https://www.internetmatters.org/pt/parental-controls/pinterest-privacy-and-safety-settings/"
+                class="squad-content" data-wpel-link="internal">
+                <img src="https://www.internetmatters.org/wp-content/uploads/2024/08/pinterest-ft-600x313.png"
+                    alt="Estas são as configurações de privacidade e segurança do Pinterest" width="600" height="315">
+                <div class="bottom">
+                    <h3 class="block-title">Configurações de privacidade e segurança do Pinterest</h3><i
+                        class="fa-sharp fas fa-chevron-right"></i>
+                </div>
+            </a>
+            <a href="https://www.internetmatters.org/pt/parental-controls/social-media/skype-security-and-privacy-settings/"
+                class="squad-content" data-wpel-link="internal">
+                <img src="https://www.internetmatters.org/wp-content/uploads/2024/08/skype-hero-1-1-600x315.png"
+                    alt="Estas são as configurações de segurança e privacidade do Skype" width="600" height="315">
+                <div class="bottom">
+                    <h3 class="block-title">Configurações de segurança e privacidade do Skype</h3><i
+                        class="fa-sharp fas fa-chevron-right"></i>
+                </div>
+            </a>
+            <a href="https://www.internetmatters.org/pt/parental-controls/social-media/snapchat/" class="squad-content"
+                data-wpel-link="internal">
+                <img src="https://www.internetmatters.org/wp-content/uploads/2024/08/snapchat-logo-topic-600x314.png"
+                    alt="Este é o guia de configurações de privacidade do Snapchat" width="600" height="315">
+                <div class="bottom">
+                    <h3 class="block-title">Guia de configurações de privacidade do Snapchat</h3><i
+                        class="fa-sharp fas fa-chevron-right"></i>
+                </div>
+            </a>
+            <a href="https://www.internetmatters.org/pt/parental-controls/social-media/tiktok-privacy-and-safety-settings/"
+                class="squad-content" data-wpel-link="internal">
+                <img src="https://www.internetmatters.org/wp-content/uploads/2024/08/tiktok_logo-1-1-600x314.png"
+                    alt="Estas são as configurações de controle parental e segurança do TikTok" width="600"
+                    height="315">
+                <div class="bottom">
+                    <h3 class="block-title">Controle dos pais e configurações de segurança do TikTok</h3><i
+                        class="fa-sharp fas fa-chevron-right"></i>
+                </div>
+            </a>
+            <a href="https://www.internetmatters.org/pt/parental-controls/social-media/wattpad-safety-privacy-guide/"
+                class="squad-content" data-wpel-link="internal">
+                <img src="https://www.internetmatters.org/wp-content/uploads/2024/08/wattpad-img-600x315.png"
+                    alt="Este é o guia de segurança e privacidade do Wattpad" width="600" height="315">
+                <div class="bottom">
+                    <h3 class="block-title">Guia de segurança e privacidade do Wattpad</h3><i
+                        class="fa-sharp fas fa-chevron-right"></i>
+                </div>
+            </a>
+            <a href="https://www.internetmatters.org/pt/parental-controls/social-media/whatsapp/" class="squad-content"
+                data-wpel-link="internal">
+                <img src="https://www.internetmatters.org/wp-content/uploads/2024/08/Whatsapp-logo-pc-600x314.png"
+                    alt="Este é o guia de privacidade do WhatsApp" width="600" height="315">
+                <div class="bottom">
+                    <h3 class="block-title">Guia de privacidade do WhatsApp</h3><i
+                        class="fa-sharp fas fa-chevron-right"></i>
+                </div>
+            </a>
+            <a href="https://www.internetmatters.org/pt/parental-controls/social-media/twitter/" class="squad-content"
+                data-wpel-link="internal">
+                <img src="https://www.internetmatters.org/wp-content/uploads/2024/08/x-formerly-twitter-article-hero-1-600x315.webp"
+                    alt="Este é o guia de segurança do X (antigo Twitter)" width="600" height="315">
+                <div class="bottom">
+                    <h3 class="block-title">Guia de segurança do X (anteriormente Twitter)</h3><i
+                        class="fa-sharp fas fa-chevron-right"></i>
+                </div>
+            </a>
+            <a href="https://www.internetmatters.org/pt/parental-controls/social-media/yubo/" class="squad-content"
+                data-wpel-link="internal">
+                <img src="https://www.internetmatters.org/wp-content/uploads/2024/08/yubo-logo-600x315.png"
+                    alt="Este é o guia de segurança Yubo" width="600" height="315">
+                <div class="bottom">
+                    <h3 class="block-title">Guia de segurança do Yubo</h3><i class="fa-sharp fas fa-chevron-right"></i>
+                </div>
+            </a>
+
+        </div>
+
+    </div>
+
+    <body>
+
+        <footer>
+            <img src="src/images/wave.svg">
+
+            <div id="footer_items">
+                <span id="copyright">
+                    &copy 2024 Milene Lopes
+                </span>
+
+            </div>
+
+        </footer>
+
+        <!-- Firebase App SDK -->
+        <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+
+        <!-- Firebase Firestore SDK -->
+        <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+
+        <!-- Configuração do Firebase -->
+        <script src="src/javascript/firebase-config.js"></script>
+
+        <!-- Script Principal -->
+        <script src="src/javascript/script.js"></script>
+
+    </body>
+
+</html>

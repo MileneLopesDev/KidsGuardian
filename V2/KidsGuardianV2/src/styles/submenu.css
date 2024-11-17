@@ -1,0 +1,33 @@
+/* Submenu */
+.submenu {
+    display: none;
+    position: absolute;
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    list-style: none;
+    padding: 10px 0;
+    margin: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.submenu li {
+    padding: 5px 20px;
+    text-align: left;
+}
+
+.submenu li a {
+    text-decoration: none;
+    color: #333;
+    display: block;
+    width: 100%;
+}
+
+.submenu li:hover {
+    background-color: #f4f4f4;
+}
+
+/* Posiciona o submenu abaixo do nome do usuário */
+.nav-item:hover .submenu {
+    display: block;
+}

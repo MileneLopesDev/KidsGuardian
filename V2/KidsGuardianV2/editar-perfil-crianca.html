@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Perfil da Criança</title>
+    <link rel="stylesheet" href="src/styles/styles.css">
+</head>
+
+<body>
+    <header>
+        <nav id="navbar">
+            <div class="logo"><img src="src/images/logo.png"></div>
+            <ul id="nav_list">
+              <li class="nav-item active"><a href="index.html">Inicio</a></li>
+              <li class="nav-item"><a href="explorar.html">Explore</a></li>
+              <li class="nav-item"><a href="login.html"></a></li>
+            </ul>
+            <button id="mobile_btn"><i class="fa-solid fa-bars"></i></button>
+          </nav>
+    </header>
+
+    <main>
+        <div class="form-container">
+            <h2>Editar Perfil da Criança</h2>
+            <form id="editChildProfileForm">
+                <label for="childName">Nome da Criança:</label>
+                <input type="text" id="childName" required>
+
+                <label for="childAge">Idade:</label>
+                <input type="number" id="childAge" min="0" max="18" required>
+
+                <label for="preferences">Preferências (separadas por vírgula):</label>
+                <input type="text" id="preferences">
+
+                <button class="btn-default" type="submit">Salvar Alterações</button>
+            </form>
+            <div id="formMessage"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Milene Lopes</p>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="src/javascript/firebase-config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const childId = urlParams.get('id');
+
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    const db = firebase.firestore();
+                    const userId = user.uid;
+
+                    // Carrega os dados da criança
+                    db.collection('usuarios')
+                        .doc(userId)
+                        .collection('childrenProfiles')
+                        .doc(childId)
+                        .get()
+                        .then((doc) => {
+                            if (doc.exists) {
+                                const data = doc.data();
+                                document.getElementById('childName').value = data.name;
+                                document.getElementById('childAge').value = data.age;
+                                document.getElementById('preferences').value = data.preferences.join(', ');
+                            } else {
+                                alert('Perfil não encontrado.');
+                                window.location.href = 'index.html';
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Erro ao carregar o perfil:', error);
+                        });
+
+                    // Salvar alterações
+                    document.getElementById('editChildProfileForm').addEventListener('submit', (event) => {
+                        event.preventDefault();
+
+                        const updatedName = document.getElementById('childName').value.trim();
+                        const updatedAge = parseInt(document.getElementById('childAge').value.trim());
+                        const updatedPreferences = document
+                            .getElementById('preferences')
+                            .value.trim()
+                            .split(',');
+
+                        db.collection('usuarios')
+                            .doc(userId)
+                            .collection('childrenProfiles')
+                            .doc(childId)
+                            .update({
+                                name: updatedName,
+                                age: updatedAge,
+                                preferences: updatedPreferences,
+                            })
+                            .then(() => {
+                                document.getElementById('formMessage').textContent =
+                                    'Alterações salvas com sucesso!';
+                                document.getElementById('formMessage').style.color = 'green';
+                            })
+                            .catch((error) => {
+                                console.error('Erro ao salvar alterações:', error);
+                                document.getElementById('formMessage').textContent =
+                                    'Erro ao salvar alterações.';
+                                document.getElementById('formMessage').style.color = 'red';
+                            });
+                    });
+                } else {
+                    alert('Faça login para editar o perfil.');
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
