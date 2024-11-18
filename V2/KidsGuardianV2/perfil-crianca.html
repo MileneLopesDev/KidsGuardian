@@ -23,7 +23,7 @@
                 <li class="nav-item">
                     <a href="explorar.html">Explore</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" id="loginNavItem">
                     <a href="login.html">Login</a>
                 </li>
             </ul>
@@ -36,7 +36,7 @@
             <form id="childProfileForm">
                 <label for="childName">Nome da Criança:</label>
                 <input type="text" id="childName" placeholder="Ex: João" required>
-                
+
                 <label for="childAge">Idade:</label>
                 <input type="number" id="childAge" placeholder="Ex: 8" min="0" max="18" required>
 
@@ -62,44 +62,44 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
     <script src="src/javascript/firebase-config.js"></script>
     <script>
-document.getElementById('childProfileForm').addEventListener('submit', function (event) {
-    event.preventDefault();
+        document.getElementById('childProfileForm').addEventListener('submit', function (event) {
+            event.preventDefault();
 
-    const childName = document.getElementById('childName').value.trim();
-    const childAge = parseInt(document.getElementById('childAge').value.trim());
-    const preferences = document.getElementById('preferences').value.trim().split(',');
+            const childName = document.getElementById('childName').value.trim();
+            const childAge = parseInt(document.getElementById('childAge').value.trim());
+            const preferences = document.getElementById('preferences').value.trim().split(',');
 
-    firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-            const userId = user.uid;
-            const db = firebase.firestore();
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    const userId = user.uid;
+                    const db = firebase.firestore();
 
-            // Salva no Firestore
-            db.collection('usuarios')
-                .doc(userId)
-                .collection('childrenProfiles')
-                .add({
-                    name: childName,
-                    age: childAge,
-                    preferences: preferences,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                })
-                .then(() => {
-                    document.getElementById('formMessage').textContent = 'Perfil salvo com sucesso!';
-                    document.getElementById('formMessage').style.color = 'green';
-                    document.getElementById('childProfileForm').reset();
-                })
-                .catch((error) => {
-                    console.error('Erro ao salvar o perfil:', error);
-                    document.getElementById('formMessage').textContent = 'Erro ao salvar o perfil.';
-                    document.getElementById('formMessage').style.color = 'red';
-                });
-        } else {
-            alert('Faça login para salvar o perfil.');
-            window.location.href = 'login.html';
-        }
-    });
-});
+                    // Salva no Firestore
+                    db.collection('usuarios')
+                        .doc(userId)
+                        .collection('childrenProfiles')
+                        .add({
+                            name: childName,
+                            age: childAge,
+                            preferences: preferences,
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        })
+                        .then(() => {
+                            document.getElementById('formMessage').textContent = 'Perfil salvo com sucesso!';
+                            document.getElementById('formMessage').style.color = 'green';
+                            document.getElementById('childProfileForm').reset();
+                        })
+                        .catch((error) => {
+                            console.error('Erro ao salvar o perfil:', error);
+                            document.getElementById('formMessage').textContent = 'Erro ao salvar o perfil.';
+                            document.getElementById('formMessage').style.color = 'red';
+                        });
+                } else {
+                    alert('Faça login para salvar o perfil.');
+                    window.location.href = 'login.html';
+                }
+            });
+        });
 
     </script>
 </body>

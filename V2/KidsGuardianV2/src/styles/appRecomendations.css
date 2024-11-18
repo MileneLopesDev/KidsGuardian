@@ -1,7 +1,7 @@
 #appRecomendations {
     min-height: calc(100vh - 91px);
     display: flex;
-    align-items: center;
+    align-items:center;
     justify-content: center;
     gap: 48px;
 }
@@ -54,12 +54,10 @@
 
 .app-content p{
     display: flex;
-    justify-content: space-between;
+    justify-content: left;
 }
 
-.app-content p span {
-    color: #e9a209;
-}
+
 @media screen and (max-width: 1170px){
     #appRecomendations {
         flex-direction: column;
