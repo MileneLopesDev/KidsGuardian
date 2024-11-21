@@ -40,12 +40,25 @@
                 <label for="childAge">Idade:</label>
                 <input type="number" id="childAge" placeholder="Ex: 8" min="0" max="18" required>
 
-                <label for="preferences">Preferências (separadas por vírgula):</label>
-                <input type="text" id="preferences" placeholder="Ex: livros, música, jogos educativos">
+                <label>Preferências:</label>
+                <div class="checkbox" id="preferences">
+                    <label><input type="checkbox" value="Filmes"> Filmes</label>
+                    <label><input type="checkbox" value="Música"> Música</label>
+                    <label><input type="checkbox" value="Video-Games"> Video-Games</label>
+                    <label><input type="checkbox" value="Desenhos Animados"> Desenhos Animados</label>
+                    <label><input type="checkbox" value="Esportes"> Esportes</label>
+                    <label><input type="checkbox" value="Leitura"> Leitura</label>
+                    <label><input type="checkbox" value="Atividades ao Ar Livre"> Atividades ao Ar Livre</label>
+                    <label><input type="checkbox" value="Atividades Artesanais"> Atividades Artesanais</label>
+                </div>
 
                 <button class="btn-default" type="submit">Salvar Perfil</button>
+                <button class="btn-default" type="button" id="addMoreProfile">Adicionar Mais Um Perfil</button>
             </form>
             <div id="formMessage"></div>
+
+            <h3>Perfis Adicionados</h3>
+            <ul id="profilesList"></ul>
         </div>
     </main>
 
@@ -62,19 +75,24 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
     <script src="src/javascript/firebase-config.js"></script>
     <script>
-        document.getElementById('childProfileForm').addEventListener('submit', function (event) {
+        const childProfileForm = document.getElementById('childProfileForm');
+        const profilesList = document.getElementById('profilesList');
+        const addMoreProfileButton = document.getElementById('addMoreProfile');
+
+        // Adiciona funcionalidade ao botão "Salvar Perfil"
+        childProfileForm.addEventListener('submit', function (event) {
             event.preventDefault();
 
             const childName = document.getElementById('childName').value.trim();
             const childAge = parseInt(document.getElementById('childAge').value.trim());
-            const preferences = document.getElementById('preferences').value.trim().split(',');
+            const preferences = Array.from(document.querySelectorAll('#preferences input:checked'))
+                .map(input => input.value);
 
             firebase.auth().onAuthStateChanged((user) => {
                 if (user) {
                     const userId = user.uid;
                     const db = firebase.firestore();
 
-                    // Salva no Firestore
                     db.collection('usuarios')
                         .doc(userId)
                         .collection('childrenProfiles')
@@ -87,7 +105,13 @@
                         .then(() => {
                             document.getElementById('formMessage').textContent = 'Perfil salvo com sucesso!';
                             document.getElementById('formMessage').style.color = 'green';
-                            document.getElementById('childProfileForm').reset();
+
+                            // Adiciona o perfil à lista exibida
+                            const li = document.createElement('li');
+                            li.textContent = `Nome: ${childName}, Idade: ${childAge}, Preferências: ${preferences.join(', ')}`;
+                            profilesList.appendChild(li);
+
+                            childProfileForm.reset();
                         })
                         .catch((error) => {
                             console.error('Erro ao salvar o perfil:', error);
@@ -101,6 +125,11 @@
             });
         });
 
+        // Adiciona funcionalidade ao botão "Adicionar Mais Um Perfil"
+        addMoreProfileButton.addEventListener('click', () => {
+            document.getElementById('formMessage').textContent = '';
+            childProfileForm.reset();
+        });
     </script>
 </body>
 

@@ -2,128 +2,154 @@
 <html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Perfil da Criança</title>
-    <link rel="stylesheet" href="src/styles/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="src/styles/styles.css">
+  <link rel="icon" type="image/png" href="src/images/icon.png">
+  <title>KG - Editar Perfil</title>
 </head>
 
 <body>
-    <header>
-        <nav id="navbar">
-            <div class="logo"><img src="src/images/logo.png"></div>
-            <ul id="nav_list">
-                <li class="nav-item active">
-                    <a href="index.html">Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a href="explorar.html">Explore</a>
-                </li>
-                <li class="nav-item" id="loginNavItem">
-                    <a href="login.html">Login</a>
-                </li>
-            </ul>
-            <button id="mobile_btn"><i class="fa-solid fa-bars"></i></button>
-        </nav>
-    </header>
+  <header>
+    <nav id="navbar">
+      <div class="logo"><img src="src/images/logo.png" alt="Logo"></div>
+      <ul id="nav_list">
+        <li class="nav-item active"><a href="index.html">Inicio</a></li>
+        <li class="nav-item"><a href="explorar.html">Explore</a></li>
+        <li class="nav-item" id="loginNavItem"><a href="login.html">Login</a></li>
+      </ul>
+      <button id="mobile_btn"><i class="fa-solid fa-bars"></i></button>
+    </nav>
+  </header>
 
-    <main>
-        <div class="form-container">
-            <h2>Editar Perfil da Criança</h2>
-            <form id="editChildProfileForm">
-                <label for="childName">Nome da Criança:</label>
-                <input type="text" id="childName" required>
+  <main>
+    <div class="form-container">
+      <div class="child-profile">
+        <h2 id="childFormTitle">Editar Perfil da Criança</h2>
+        <form id="editChildProfileForm">
+          <label for="childName">Nome da Criança:</label>
+          <input type="text" id="childName" required placeholder="Insira o nome da criança">
 
-                <label for="childAge">Idade:</label>
-                <input type="number" id="childAge" min="0" max="18" required>
+          <label for="childAge">Idade:</label>
+          <input type="number" id="childAge" min="0" max="18" required placeholder="Insira a idade da criança">
 
-                <label for="preferences">Preferências (separadas por vírgula):</label>
-                <input type="text" id="preferences">
+          <label>Preferências:</label>
+          <div class="checkbox" id="preferences">
+            <label><input type="checkbox" value="Filmes"> Filmes</label>
+            <label><input type="checkbox" value="Música"> Música</label>
+            <label><input type="checkbox" value="Video-Games"> Video-Games</label>
+            <label><input type="checkbox" value="Desenhos Animados"> Desenhos Animados</label>
+            <label><input type="checkbox" value="Esportes"> Esportes</label>
+            <label><input type="checkbox" value="Leitura"> Leitura</label>
+            <label><input type="checkbox" value="Atividades ao Ar Livre"> Atividades ao Ar Livre</label>
+            <label><input type="checkbox" value="Atividades Artesanais"> Atividades Artesanais</label>
+          </div>
 
-                <button class="btn-default" type="submit">Salvar Alterações</button>
-            </form>
-            <div id="formMessage"></div>
-        </div>
-    </main>
+          <button class="btn-default" type="submit">Salvar Alterações</button>
+        </form>
+        <div id="formMessage"></div>
+      </div>
+    </div>
+  </main>
 
-    <footer>
-        <p>&copy; 2024 Milene Lopes</p>
-    </footer>
+  <footer>
+    <img src="src/images/wave.svg" alt="Wave">
+    <div id="footer_items">
+      <span id="copyright">&copy; 2024 Milene Lopes</span>
+    </div>
+  </footer>
 
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
-    <script src="src/javascript/firebase-config.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const childId = urlParams.get('id');
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+  <script src="src/javascript/firebase-config.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const urlParams = new URLSearchParams(window.location.search);
+      const childId = urlParams.get('id'); // ID da criança, se disponível.
 
-            firebase.auth().onAuthStateChanged((user) => {
-                if (user) {
-                    const db = firebase.firestore();
-                    const userId = user.uid;
+      // Listener de autenticação do Firebase
+      firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+          alert('Você precisa estar logado para acessar esta página.');
+          window.location.href = 'login.html';
+          return;
+        }
 
-                    // Carrega os dados da criança
-                    db.collection('usuarios')
-                        .doc(userId)
-                        .collection('childrenProfiles')
-                        .doc(childId)
-                        .get()
-                        .then((doc) => {
-                            if (doc.exists) {
-                                const data = doc.data();
-                                document.getElementById('childName').value = data.name;
-                                document.getElementById('childAge').value = data.age;
-                                document.getElementById('preferences').value = data.preferences.join(', ');
-                            } else {
-                                alert('Perfil não encontrado.');
-                                window.location.href = 'index.html';
-                            }
-                        })
-                        .catch((error) => {
-                            console.error('Erro ao carregar o perfil:', error);
-                        });
+        const userId = user.uid;
+        carregarPerfilCrianca(userId, childId);
+      });
 
-                    // Salvar alterações
-                    document.getElementById('editChildProfileForm').addEventListener('submit', (event) => {
-                        event.preventDefault();
+      // Função para carregar o perfil da criança
+      function carregarPerfilCrianca(userId, childId) {
+        const childFormTitle = document.getElementById('childFormTitle');
+        const checkboxes = document.querySelectorAll('#preferences input[type="checkbox"]');
 
-                        const updatedName = document.getElementById('childName').value.trim();
-                        const updatedAge = parseInt(document.getElementById('childAge').value.trim());
-                        const updatedPreferences = document
-                            .getElementById('preferences')
-                            .value.trim()
-                            .split(',');
+        if (!childId) {
+          childFormTitle.textContent = 'Cadastrar Criança';
+          return;
+        }
 
-                        db.collection('usuarios')
-                            .doc(userId)
-                            .collection('childrenProfiles')
-                            .doc(childId)
-                            .update({
-                                name: updatedName,
-                                age: updatedAge,
-                                preferences: updatedPreferences,
-                            })
-                            .then(() => {
-                                document.getElementById('formMessage').textContent =
-                                    'Alterações salvas com sucesso!';
-                                document.getElementById('formMessage').style.color = 'green';
-                            })
-                            .catch((error) => {
-                                console.error('Erro ao salvar alterações:', error);
-                                document.getElementById('formMessage').textContent =
-                                    'Erro ao salvar alterações.';
-                                document.getElementById('formMessage').style.color = 'red';
-                            });
-                    });
-                } else {
-                    alert('Faça login para editar o perfil.');
-                    window.location.href = 'login.html';
-                }
-            });
-        });
-    </script>
+        const db = firebase.firestore();
+        db.collection('usuarios').doc(userId).collection('childrenProfiles').doc(childId).get()
+          .then((doc) => {
+            if (doc.exists) {
+              const data = doc.data();
+              document.getElementById('childName').value = data.name || '';
+              document.getElementById('childAge').value = data.age || '';
+
+              // Marcar os checkboxes com base nas preferências salvas
+              const savedPreferences = data.preferences || [];
+              checkboxes.forEach(checkbox => {
+                checkbox.checked = savedPreferences.includes(checkbox.value);
+              });
+
+              childFormTitle.textContent = 'Editar Perfil da Criança';
+            } else {
+              console.log('Perfil da criança não encontrado.');
+            }
+          })
+          .catch((error) => {
+            console.error('Erro ao carregar perfil da criança:', error);
+          });
+      }
+
+      // Função para salvar ou atualizar o perfil da criança
+      document.getElementById('editChildProfileForm').addEventListener('submit', (event) => {
+        event.preventDefault();
+
+        const updatedName = document.getElementById('childName').value.trim();
+        const updatedAge = parseInt(document.getElementById('childAge').value.trim(), 10);
+        const updatedPreferences = Array.from(document.querySelectorAll('#preferences input:checked'))
+          .map(input => input.value);
+
+        const userId = firebase.auth().currentUser.uid;
+        const db = firebase.firestore();
+
+        const childDocRef = childId
+          ? db.collection('usuarios').doc(userId).collection('childrenProfiles').doc(childId)
+          : db.collection('usuarios').doc(userId).collection('childrenProfiles').doc();
+
+        childDocRef.set({
+          name: updatedName,
+          age: updatedAge,
+          preferences: updatedPreferences,
+        }, { merge: true })
+          .then(() => {
+            document.getElementById('formMessage').textContent = 'Alterações salvas com sucesso!';
+            document.getElementById('formMessage').style.color = 'green';
+          })
+          .catch((error) => {
+            console.error('Erro ao salvar alterações:', error);
+            document.getElementById('formMessage').textContent = 'Erro ao salvar alterações.';
+            document.getElementById('formMessage').style.color = 'red';
+          });
+      });
+    });
+  </script>
 </body>
 
 </html>

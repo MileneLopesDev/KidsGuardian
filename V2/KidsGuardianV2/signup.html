@@ -4,54 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
-        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="src/styles/styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"
-        integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="icon" type="image/png" href="src/images/icon.png">
-    <script src="https://unpkg.com/scrollreveal"></script>
     <title>KG - Cadastro</title>
 </head>
 
 <body>
     <header>
         <nav id="navbar">
-
-
             <div class="logo"><img src="src/images/logo.png"></div>
-
             <ul id="nav_list">
-                <li class="nav-item active">
-                    <a href="index.html">Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a href="explorar.html">Explore</a>
+                <li class="nav-item active"><a href="index.html">Inicio</a></li>
+                <li class="nav-item"><a href="explorar.html">Explore</a></li>
             </ul>
-
-
-
-            <button id="mobile_btn">
-                <i class="fa-solid fa-bars"></i>
-            </button>
+            <button id="mobile_btn"><i class="fa-solid fa-bars"></i></button>
         </nav>
-        <div id="mobile_menu">
-            <ul id="mobile_nav_list">
-                <li class="nav-item">
-                    <a href="index.html">Inicio</a>
-                </li>
-                <li class="nav-item">
-                    <a href="explorar.html">Explorar</a>
-                </li>
-                <li class="nav-item">
-                    <a href="login.html">Login</a>
-                </li>
-            </ul>
-
-
-        </div>
     </header>
 
     <div class="form-container">
@@ -65,94 +32,69 @@
             <input type="password" id="password" required>
             <label for="confirmPassword">Confirmar Senha:</label>
             <input type="password" id="confirmPassword" required>
-            <label for="categoria">Você é:</label>
-            <select>
-                <option value="0">Apenas interessado pelo assunto</option>
-                <option value="1">Responsavél</option>
-                <option value="2">Educador</option>
-            </select>
-
+            <label>Você é:</label>
+            <div class="checkbox" id="categoria">
+                <label><input type="checkbox" value="Responsável"> Responsável</label>
+                <label><input type="checkbox" value="Educador"> Educador</label>
+            </div>
             <button class="btn-default" type="submit">Cadastrar</button>
         </form>
         <p>Já tem uma conta? <a href="login.html">Faça login</a></p>
         <div id="signupError"></div>
     </div>
+
     <footer>
         <img src="src/images/wave.svg">
-
         <div id="footer_items">
-            <span id="copyright">
-                &copy 2024 Milene Lopes
-            </span>
-
+            <span>&copy; 2024 Milene Lopes</span>
         </div>
-
     </footer>
 
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
     <script src="src/javascript/firebase-config.js"></script>
-    <script src="src/javascript/script.js"></script>
     <script>
-        // Função para cadastrar usuário
         document.getElementById('signupForm').addEventListener('submit', function (event) {
-            event.preventDefault(); // Previne o envio padrão do formulário
+            event.preventDefault();
 
-            var name = document.getElementById('displayName').value;
-            var email = document.getElementById('email').value;
-            var password = document.getElementById('password').value;
-            var confirmPassword = document.getElementById('confirmPassword').value;
-            var categoria = document.querySelector('select').value; // Captura o valor do select
+            const name = document.getElementById('displayName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const selectedCategories = Array.from(document.querySelectorAll('#categoria input:checked'))
+                .map(input => input.value);
 
-            var errorDiv = document.getElementById('signupError');
-            errorDiv.textContent = ''; // Limpa mensagens de erro
+            const errorDiv = document.getElementById('signupError');
+            errorDiv.textContent = '';
 
-            // Verifica se as senhas são iguais
             if (password !== confirmPassword) {
                 errorDiv.textContent = 'As senhas não coincidem. Por favor, tente novamente.';
                 return;
             }
 
-            // Cria o usuário no Firebase
             firebase.auth().createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    var user = userCredential.user;
+                    const user = userCredential.user;
 
-                    // Atualiza o perfil do usuário com o nome
-                    return user.updateProfile({
-                        displayName: name
-                    }).then(() => {
-                        // Atualiza os dados adicionais no Firebase, incluindo a categoria
+                    return user.updateProfile({ displayName: name }).then(() => {
                         firebase.firestore().collection('usuarios').doc(user.uid).set({
                             nome: name,
                             email: email,
-                            categoria: categoria // Aqui você armazena a categoria
-                        })
-                            .then(() => {
-                                alert('Conta criada com sucesso!');
-                                window.location.href = 'login.html'; // Redireciona para a página de login
-                            })
-                            .catch((error) => {
-                                errorDiv.textContent = 'Erro ao salvar dados adicionais: ' + error.message;
-                            });
+                            categorias: selectedCategories
+                        }).then(() => {
+                            alert('Conta criada com sucesso!');
+                            window.location.href = 'login.html';
+                        }).catch((error) => {
+                            errorDiv.textContent = 'Erro ao salvar dados adicionais: ' + error.message;
+                        });
                     });
                 })
                 .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-
-                    if (errorCode === 'auth/email-already-in-use') {
-                        errorDiv.textContent = 'Este e-mail já está em uso.';
-                    } else if (errorCode === 'auth/weak-password') {
-                        errorDiv.textContent = 'A senha é muito fraca. Tente usar uma senha mais forte.';
-                    } else {
-                        errorDiv.textContent = 'Erro: ' + errorMessage;
-                    }
+                    errorDiv.textContent = 'Erro: ' + error.message;
                 });
         });
     </script>
-
 </body>
 
 </html>
