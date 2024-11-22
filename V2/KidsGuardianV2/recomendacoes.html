@@ -34,8 +34,8 @@
         <div id="artigosContainer">
             <!-- Recomendações serão carregadas aqui -->
         </div>
-   
-    
+
+
         </div>
     </main>
 
@@ -43,67 +43,78 @@
         <p>&copy; 2024 Milene Lopes</p>
     </footer>
 
+    <!-- Firebase App SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+
+    <!-- Firebase Auth SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+
+    <!-- Firebase Firestore SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+
+    <!-- Configuração do Firebase -->
     <script src="src/javascript/firebase-config.js"></script>
-    <script src="src/javascript/recomendacoes.js"></script>
+
+    <!-- Script Principal -->
+    <script src="src/javascript/script.js"></script>
+
+
     <script>
         firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-        const userId = user.uid;
-        const db = firebase.firestore();
-        const artigosContainer = document.getElementById('artigosContainer');
+            if (user) {
+                const userId = user.uid;
+                const db = firebase.firestore();
+                const artigosContainer = document.getElementById('artigosContainer');
 
-        // Busca perfis de crianças do usuário
-        db.collection('usuarios')
-            .doc(userId)
-            .collection('childrenProfiles')
-            .get()
-            .then((querySnapshot) => {
-                if (!querySnapshot.empty) {
-                    const ages = [];
-                    querySnapshot.forEach((doc) => {
-                        const childProfile = doc.data();
-                        ages.push(childProfile.age);
-                    });
+                // Busca perfis de crianças do usuário
+                db.collection('usuarios')
+                    .doc(userId)
+                    .collection('childrenProfiles')
+                    .get()
+                    .then((querySnapshot) => {
+                        if (!querySnapshot.empty) {
+                            const ages = [];
+                            querySnapshot.forEach((doc) => {
+                                const childProfile = doc.data();
+                                ages.push(childProfile.age);
+                            });
 
-                    // Filtra artigos pela idade das crianças
-                    db.collection('artigos')
-                        .where('idade', 'array-contains-any', ages)
-                        .get()
-                        .then((articlesSnapshot) => {
-                            if (!articlesSnapshot.empty) {
-                                articlesSnapshot.forEach((doc) => {
-                                    const article = doc.data();
-                                    artigosContainer.innerHTML += `
+                            // Filtra artigos pela idade das crianças
+                            db.collection('artigos')
+                                .where('idade', 'array-contains-any', ages)
+                                .get()
+                                .then((articlesSnapshot) => {
+                                    if (!articlesSnapshot.empty) {
+                                        articlesSnapshot.forEach((doc) => {
+                                            const article = doc.data();
+                                            artigosContainer.innerHTML += `
                                        <div class="artigo" data-id="${doc.id}">
                                     <h2>${article.titulo}</h2>
                                     <p><strong>Idade:</strong> ${article.idade.join(', ')}</p>
                                     <p>${article.conteudo.substring(0, 150)}...</p>
                                     <a href="detalhes-artigos.html?id=${doc.id}" class="btn-default">Leia mais</a>
                                     `;
-                                   
+
+                                        });
+                                    } else {
+                                        artigosContainer.innerHTML = '<p>Nenhuma recomendação disponível.</p>';
+                                    }
+                                })
+                                .catch((error) => {
+                                    console.error('Erro ao buscar artigos:', error);
                                 });
-                            } else {
-                                artigosContainer.innerHTML = '<p>Nenhuma recomendação disponível.</p>';
-                            }
-                        })
-                        .catch((error) => {
-                            console.error('Erro ao buscar artigos:', error);
-                        });
-                } else {
-                    artigosContainer.innerHTML = '<p>Crie perfis de crianças para receber recomendações.</p>';
-                }
-            })
-            .catch((error) => {
-                console.error('Erro ao carregar perfis de crianças:', error);
-            });
-    } else {
-        alert('Faça login para acessar as recomendações.');
-        window.location.href = 'login.html';
-    }
-});
+                        } else {
+                            artigosContainer.innerHTML = '<p>Crie perfis de crianças para receber recomendações.</p>';
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Erro ao carregar perfis de crianças:', error);
+                    });
+            } else {
+                alert('Faça login para acessar as recomendações.');
+                window.location.href = 'login.html';
+            }
+        });
 
     </script>
 </body>

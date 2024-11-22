@@ -49,20 +49,8 @@ $(document).ready(function () {
         distance: '20%',
     });
 
-    // Monitorar estado de autenticação
-    firebase.auth().onAuthStateChanged((user) => {
-        const loginNavItem = document.getElementById('loginNavItem');
-        const loginLink = loginNavItem.querySelector('a');
 
-        if (user) {
-            const userName = user.displayName || user.email.split('@')[0];
-            loginLink.textContent = userName;
-            loginLink.href = "perfil.html";
-        } else {
-            loginLink.textContent = "Login";
-            loginLink.href = "login.html";
-        }
-    });
+      
 
     // Buscar artigos por faixa etária
     const faixaEtaria = new URLSearchParams(window.location.search).get('idade');
@@ -256,91 +244,105 @@ $(document).ready(function () {
     }
 });
 
-// Submenu
-firebase.auth().onAuthStateChanged((user) => {
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Verificar se o Firebase foi inicializado corretamente
+    if (!firebase || !firebase.auth || !firebase.firestore) {
+      console.error("Firebase não foi inicializado corretamente.");
+      return;
+    }
+  
+    // Monitorar estado de autenticação
+    firebase.auth().onAuthStateChanged((user) => {
+      const loginNavItem = document.getElementById("loginNavItem");
+      const loginLink = loginNavItem.querySelector("a");
+  
+      if (user) {
+        const userName = user.displayName || user.email.split("@")[0];
+        loginLink.textContent = userName;
+        loginLink.href = "perfil.html";
+  
+        // Criar submenu para perfis
+        const subMenu = document.createElement("ul");
+        subMenu.className = "submenu";
+  
+        // Adiciona "Editar Perfil"
+        const editProfileItem = document.createElement("li");
+        editProfileItem.innerHTML = `<a href="editar-perfil.html">Editar Perfil</a>`;
+        subMenu.appendChild(editProfileItem);
+  
+        // Buscar perfis das crianças no Firestore
+        const db = firebase.firestore();
+        db.collection("usuarios")
+          .doc(user.uid)
+          .collection("childrenProfiles")
+          .get()
+          .then((querySnapshot) => {
+            if (!querySnapshot.empty) {
+              querySnapshot.forEach((doc) => {
+                const childProfile = doc.data();
+                const childId = doc.id;
+  
+                const listItem = document.createElement("li");
+                listItem.innerHTML = `
+                  <a href="editar-perfil-crianca.html?id=${childId}">
+                    ${childProfile.name} (${childProfile.age} anos)
+                  </a>
+                `;
+                subMenu.appendChild(listItem);
+              });
+            } else {
+              const noChildProfile = document.createElement("li");
+              noChildProfile.innerHTML = `
+                <a href="perfil-crianca.html">Criar Perfil da Criança</a>
+              `;
+              subMenu.appendChild(noChildProfile);
+            }
+  
+            // Adiciona logout
+            const logoutItem = document.createElement("li");
+            logoutItem.innerHTML = '<a href="#" id="logoutButton">Logout</a>';
+            subMenu.appendChild(logoutItem);
+  
+            document.getElementById("logoutButton").addEventListener("click", () => {
+              firebase.auth().signOut().then(() => {
+                alert("Você saiu.");
+                window.location.href = "index.html";
+              });
+            });
+          })
+          .catch((error) => {
+            console.error("Erro ao carregar perfis de crianças:", error);
+          });
+  
+        loginNavItem.appendChild(subMenu);
+      } else {
+        loginLink.textContent = "Login";
+        loginLink.href = "login.html";
+      }
+    });
+  });
+  
+  // menu para voce
+  firebase.auth().onAuthStateChanged((user) => {
+    const paraVoceTab = document.getElementById('paraVoceTab');
     const loginNavItem = document.getElementById('loginNavItem');
     const loginLink = loginNavItem.querySelector('a');
 
     if (user) {
-        const userId = user.uid;
-        const db = firebase.firestore();
-        loginLink.textContent = user.displayName || user.email.split('@')[0];
-        loginLink.href = "#";
+        // Mostra a aba "Para Você"
+        paraVoceTab.style.display = 'block';
 
-        // Cria o submenu
-        const subMenu = document.createElement('ul');
-        subMenu.className = 'submenu';
-
-        // Adiciona "Editar Perfil"
-        const editProfileItem = document.createElement('li');
-        editProfileItem.innerHTML = `<a href="editar-perfil.html">Editar Perfil</a>`;
-        subMenu.appendChild(editProfileItem);
-
-        // Busca perfis das crianças no Firestore
-        db.collection('usuarios')
-            .doc(userId)
-            .collection('childrenProfiles')
-            .get()
-            .then((querySnapshot) => {
-                if (!querySnapshot.empty) {
-                    querySnapshot.forEach((doc) => {
-                        const childProfile = doc.data();
-                        const childId = doc.id;
-
-                        // Cria itens do submenu para cada criança
-                        const listItem = document.createElement('li');
-                        listItem.innerHTML = `
-                            <a href="editar-perfil-crianca.html?id=${childId}">
-                                ${childProfile.name} (${childProfile.age} anos)
-                            </a>
-                        `;
-                        subMenu.appendChild(listItem);
-                    });
-
-                    // Adiciona "Recomendações" ao submenu
-                    const recommendationsItem = document.createElement('li');
-                    recommendationsItem.innerHTML = `
-                        <a href="recomendacoes.html">Recomendações para Você</a>
-                    `;
-                    subMenu.appendChild(recommendationsItem);
-                } else {
-                    // Caso nenhum perfil de criança exista, exibe opção para criar
-                    const noChildProfile = document.createElement('li');
-                    noChildProfile.innerHTML = `
-                        <a href="perfil-crianca.html">Criar Perfil da Criança</a>
-                    `;
-                    subMenu.appendChild(noChildProfile);
-                }
-
-                // Adiciona logout
-                const logoutItem = document.createElement('li');
-                logoutItem.innerHTML = '<a href="#" id="logoutButton">Logout</a>';
-                subMenu.appendChild(logoutItem);
-
-                document.getElementById('logoutButton').addEventListener('click', () => {
-                    firebase.auth().signOut().then(() => {
-                        alert('Você saiu.');
-                        window.location.href = 'index.html';
-                    });
-                });
-            })
-            .catch((error) => {
-                console.error('Erro ao carregar perfis de crianças:', error);
-            });
-
-        // Anexa o submenu ao item de login
-        loginNavItem.appendChild(subMenu);
-
-        // Exibe e oculta o submenu
-        loginNavItem.addEventListener('mouseenter', () => {
-            subMenu.style.display = 'block';
-        });
-        loginNavItem.addEventListener('mouseleave', () => {
-            subMenu.style.display = 'none';
-        });
+        // Atualiza o link de login para exibir o nome do usuário
+        const userName = user.displayName || user.email.split('@')[0];
+        loginLink.textContent = userName;
+        loginLink.href = "perfil.html";
     } else {
+        // Esconde a aba "Para Você"
+        paraVoceTab.style.display = 'none';
+
+        // Atualiza o link de login para redirecionar ao login
         loginLink.textContent = "Login";
         loginLink.href = "login.html";
     }
 });
-

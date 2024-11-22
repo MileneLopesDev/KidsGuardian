@@ -15,6 +15,7 @@
 #cta .title{
     font-size: 4rem;
     color: var(--color-neutral-1);
+    text-align: left;
 }
 
 #cta .title span{

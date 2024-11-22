@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="src/styles/styles.css">
+    <link rel="stylesheet" href="src/styles/para-voce.css">
+    <link rel="icon" type="image/png" href="src/images/icon.png">
+    <title>KG - Para Você</title>
+</head>
+
+<body>
+    <header>
+        <nav id="navbar">
+            <div class="logo"><img src="src/images/logo.png" alt="Logo"></div>
+            <ul id="nav_list">
+                <li class="nav-item"><a href="index.html">Inicio</a></li>
+                <li class="nav-item"><a href="explorar.html">Explore</a></li>
+                <li class="nav-item active"><a href="para-voce.html">Para Você</a></li>
+                <li class="nav-item" id="loginNavItem"><a href="login.html">Login</a></li>
+            </ul>
+            <button id="mobile_btn"><i class="fa-solid fa-bars"></i></button>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Conteúdos Recomendados</h1>
+        <div id="conteudos"></div>
+    </main>
+
+    <footer>
+        <img src="src/images/wave.svg" alt="Wave">
+        <div id="footer_items">
+            <span>&copy; 2024 Milene Lopes</span>
+        </div>
+    </footer>
+
+    <!-- Firebase App SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+
+    <!-- Firebase Auth SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+
+    <!-- Firebase Firestore SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+
+    <!-- Configuração do Firebase -->
+    <script src="src/javascript/firebase-config.js"></script>
+
+    <!-- Script Principal -->
+    <script src="src/javascript/script.js"></script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const conteudosContainer = document.getElementById('conteudos');
+
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    const userId = user.uid;
+                    const db = firebase.firestore();
+
+                    // Busca perfis das crianças associadas ao usuário
+                    db.collection('usuarios').doc(userId).collection('childrenProfiles').get()
+                        .then((querySnapshot) => {
+                            if (!querySnapshot.empty) {
+                                querySnapshot.forEach((doc) => {
+                                    const child = doc.data();
+                                    const age = child.age;
+
+                                    // Determina a faixa etária
+                                    let faixaEtaria = "";
+                                    if (age >= 0 && age <= 2) faixaEtaria = "faixaEtaria1";
+                                    else if (age >= 3 && age <= 5) faixaEtaria = "faixaEtaria2";
+                                    else if (age >= 6 && age <= 10) faixaEtaria = "faixaEtaria3";
+                                    else if (age >= 11 && age <= 18) faixaEtaria = "faixaEtaria4";
+
+                                    if (faixaEtaria) {
+                                        // Cria um container para cada criança
+                                        const childContainer = document.createElement('div');
+                                        childContainer.className = 'child-container';
+                                        childContainer.innerHTML = `<h2 class="child-title">Recomendações para ${child.name} (${child.age} anos)</h2>`;
+                                        conteudosContainer.appendChild(childContainer);
+
+                                        // Busca os conteúdos para a faixa etária
+                                        buscarConteudos(db, faixaEtaria, childContainer);
+                                    }
+                                });
+                            } else {
+                                conteudosContainer.innerHTML = '<p>Nenhum perfil de criança encontrado.</p>';
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Erro ao buscar perfis de crianças:", error);
+                        });
+                } else {
+                    alert('Você precisa estar logado para acessar esta página.');
+                    window.location.href = 'login.html';
+                }
+            });
+
+            // Função para buscar os conteúdos no Firestore
+            function buscarConteudos(db, faixaEtaria, container) {
+                db.collection(faixaEtaria).get()
+                    .then((querySnapshot) => {
+                        const livros = [];
+                        const filmes = [];
+                        const atividades = [];
+
+                        querySnapshot.forEach((doc) => {
+                            const data = doc.data();
+                            if (data.categoria === "livro") livros.push(data);
+                            else if (data.categoria === "filme") filmes.push(data);
+                            else if (data.categoria === "atividade") atividades.push(data);
+                        });
+
+                        // Renderiza cada categoria
+                        renderCategoria(container, "Livros", livros);
+                        renderCategoria(container, "Filmes", filmes);
+                        renderCategoria(container, "Atividades", atividades);
+                    })
+                    .catch((error) => {
+                        console.error("Erro ao buscar conteúdos:", error);
+                    });
+            }
+
+            // Função para renderizar os conteúdos
+            function renderCategoria(container, titulo, itens) {
+                if (itens.length === 0) return;
+
+                let html = `<h3>${titulo}</h3><ul>`;
+                itens.forEach((item) => {
+                    html += `
+                        <li>
+                            <img src="${item.imagemURL}" alt="${item.titulo || item.nome}" width="100">
+                            <h4>${item.titulo || item.nome}</h4>
+                            <p>${item.descricao || item.sinopse}</p>
+                            ${item.categoria === "filme" ? `<p><strong>Classificação:</strong> ${item.idade} anos</p>` : ""}
+                        </li>`;
+                });
+                html += `</ul>`;
+
+                container.innerHTML += html;
+            }
+        });
+    </script>
+</body>
+
+</html>

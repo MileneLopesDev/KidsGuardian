@@ -2,149 +2,164 @@
 <html lang="pt-BR">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="src/styles/styles.css">
-    <link rel="icon" type="image/png" href="src/images/icon.png">
-    <title>KG - Editar Perfil</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="src/styles/styles.css">
+  <link rel="icon" type="image/png" href="src/images/icon.png">
+  <title>KG - Editar Perfil</title>
 </head>
 
 <body>
-    <header>
-        <nav id="navbar">
-            <div class="logo"><img src="src/images/logo.png"></div>
-            <ul id="nav_list">
-                <li class="nav-item active"><a href="index.html">Inicio</a></li>
-                <li class="nav-item"><a href="explorar.html">Explore</a></li>
-            </ul>
-            <button id="mobile_btn"><i class="fa-solid fa-bars"></i></button>
-        </nav>
-    </header>
+  <header>
+    <nav id="navbar">
+      <div class="logo"><img src="src/images/logo.png"></div>
+      <ul id="nav_list">
+        <li class="nav-item active"><a href="index.html">Inicio</a></li>
+        <li class="nav-item"><a href="explorar.html">Explore</a></li>
+      </ul>
+      <button id="mobile_btn"><i class="fa-solid fa-bars"></i></button>
+    </nav>
+  </header>
 
-    <div class="form-container">
-        <h2>Editar Perfil</h2>
-        <form id="editProfileForm">
-            <label for="email">Email:</label>
-            <input type="email" id="email" disabled>
-            <label for="name">Nome:</label>
-            <input type="text" id="displayName" required>
-            <label>Você é:</label>
-            <div class="checkbox" id="categoria">
-                <label><input type="checkbox" value="Responsável"> Responsável</label>
-                <label><input type="checkbox" value="Educador"> Educador</label>
-            </div>
-            <button class="btn-default" type="submit">Salvar Alterações</button>
-        </form>
-        <div id="updateError"></div>
+  <div class="form-container">
+    <h2>Editar Perfil</h2>
+    <form id="editProfileForm">
+      <label for="email">Email:</label>
+      <input type="email" id="email" disabled>
+      <label for="name">Nome:</label>
+      <input type="text" id="displayName" required>
+      <label>Você é:</label>
+      <div class="radio-group" id="categoria">
+        <label><input type="radio" name="categoria" value="Responsável"> Responsável</label>
+        <label><input type="radio" name="categoria" value="Educador"> Educador</label>
+      </div>
+      <button class="btn-default" type="submit">Salvar Alterações</button>
+    </form>
+    <div id="updateError"></div>
+  </div>
+
+  <div class="children-list-container">
+    <h2>Perfis de Crianças</h2>
+    <ul id="childrenList"></ul>
+  </div>
+
+  <footer>
+    <img src="src/images/wave.svg">
+    <div id="footer_items">
+      <span>&copy; 2024 Milene Lopes</span>
     </div>
+  </footer>
+  <!-- Firebase App SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
 
-    <div class="children-list-container">
-        <h2>Perfis de Crianças</h2>
-        <ul id="childrenList"></ul>
-    </div>
+  <!-- Firebase Auth SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
 
-    <footer>
-        <img src="src/images/wave.svg">
-        <div id="footer_items">
-            <span>&copy; 2024 Milene Lopes</span>
-        </div>
-    </footer>
+  <!-- Firebase Firestore SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
 
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
-    <script src="src/javascript/firebase-config.js"></script>
-    <script>
-        // Função para carregar dados do usuário
-        function carregarDadosUsuario() {
-            const user = firebase.auth().currentUser;
-            if (user) {
-                document.getElementById('email').value = user.email;
-                document.getElementById('displayName').value = user.displayName || '';
+  <!-- Configuração do Firebase -->
+  <script src="src/javascript/firebase-config.js"></script>
 
-                firebase.firestore().collection('usuarios').doc(user.uid).get()
-                    .then((doc) => {
-                        if (doc.exists && doc.data().categorias) {
-                            const savedCategories = doc.data().categorias;
-                            const checkboxes = document.querySelectorAll('#categoria input');
-                            checkboxes.forEach((checkbox) => {
-                                checkbox.checked = savedCategories.includes(checkbox.value);
-                            });
-                        }
-                    });
-            } else {
-                alert('Você precisa estar logado para acessar esta página.');
-                window.location.href = 'login.html';
+  <!-- Script Principal -->
+  <script src="src/javascript/script.js"></script>
+
+
+  <script>
+    // Função para carregar dados do usuário
+    function carregarDadosUsuario() {
+      const user = firebase.auth().currentUser;
+      if (user) {
+        document.getElementById('email').value = user.email;
+        document.getElementById('displayName').value = user.displayName || '';
+
+        firebase.firestore().collection('usuarios').doc(user.uid).get()
+          .then((doc) => {
+            if (doc.exists && doc.data().categorias) {
+              const savedCategory = doc.data().categorias[0]; // Apenas uma categoria permitida
+              const radios = document.querySelectorAll('#categoria input[type="radio"]');
+              radios.forEach((radio) => {
+                radio.checked = radio.value === savedCategory;
+              });
             }
-        }
+          });
+      } else {
+        alert('Você precisa estar logado para acessar esta página.');
+        window.location.href = 'login.html';
+      }
+    }
 
-        // Função para carregar perfis de crianças
-        function carregarPerfisCriancas() {
-            const user = firebase.auth().currentUser;
-            const childrenList = document.getElementById('childrenList');
+    // Função para carregar perfis de crianças
+    function carregarPerfisCriancas() {
+      const user = firebase.auth().currentUser;
+      const childrenList = document.getElementById('childrenList');
 
-            if (user) {
-                const db = firebase.firestore();
-                db.collection('usuarios').doc(user.uid).collection('childrenProfiles').get()
-                    .then((querySnapshot) => {
-                        if (!querySnapshot.empty) {
-                            querySnapshot.forEach((doc) => {
-                                const data = doc.data();
-                                const li = document.createElement('li');
-                                li.textContent = `${data.name}, ${data.age} anos`;
-                                li.classList.add('child-item');
-                                li.setAttribute('data-id', doc.id);
+      if (user) {
+        const db = firebase.firestore();
+        db.collection('usuarios').doc(user.uid).collection('childrenProfiles').get()
+          .then((querySnapshot) => {
+            if (!querySnapshot.empty) {
+              querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const li = document.createElement('li');
+                li.textContent = `${data.name}, ${data.age} anos`;
+                li.classList.add('child-item');
+                li.setAttribute('data-id', doc.id);
 
-                                // Adiciona evento de clique para redirecionar
-                                li.addEventListener('click', () => {
-                                    window.location.href = `editar-perfil-crianca.html?id=${doc.id}`;
-                                });
-
-                                childrenList.appendChild(li);
-                            });
-                        } else {
-                            childrenList.textContent = 'Nenhum perfil de criança cadastrado.';
-                        }
-                    })
-                    .catch((error) => {
-                        console.error('Erro ao carregar perfis de crianças:', error);
-                    });
-            }
-        }
-
-        // Salvar dados atualizados do usuário
-        document.getElementById('editProfileForm').addEventListener('submit', function (event) {
-            event.preventDefault();
-
-            const user = firebase.auth().currentUser;
-            const displayName = document.getElementById('displayName').value;
-            const selectedCategories = Array.from(document.querySelectorAll('#categoria input:checked'))
-                .map(input => input.value);
-
-            const errorDiv = document.getElementById('updateError');
-            errorDiv.textContent = '';
-
-            if (user) {
-                user.updateProfile({ displayName }).then(() => {
-                    return firebase.firestore().collection('usuarios').doc(user.uid).set({
-                        categorias: selectedCategories
-                    }, { merge: true });
-                }).then(() => {
-                    alert('Perfil atualizado com sucesso!');
-                }).catch((error) => {
-                    errorDiv.textContent = 'Erro ao atualizar perfil: ' + error.message;
+                // Adiciona evento de clique para redirecionar
+                li.addEventListener('click', () => {
+                  window.location.href = `editar-perfil-crianca.html?id=${doc.id}`;
                 });
-            }
-        });
 
-        // Inicializa dados do usuário e perfis ao carregar a página
-        firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
-                carregarDadosUsuario();
-                carregarPerfisCriancas();
+                childrenList.appendChild(li);
+              });
+            } else {
+              childrenList.textContent = 'Nenhum perfil de criança cadastrado.';
             }
+          })
+          .catch((error) => {
+            console.error('Erro ao carregar perfis de crianças:', error);
+          });
+      }
+    }
+
+    // Salvar dados atualizados do usuário
+    document.getElementById('editProfileForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const user = firebase.auth().currentUser;
+      const displayName = document.getElementById('displayName').value;
+      const selectedCategory = document.querySelector('#categoria input[type="radio"]:checked')?.value;
+
+      const errorDiv = document.getElementById('updateError');
+      errorDiv.textContent = '';
+
+      if (!selectedCategory) {
+        errorDiv.textContent = 'Por favor, selecione uma categoria.';
+        return;
+      }
+
+      if (user) {
+        user.updateProfile({ displayName }).then(() => {
+          return firebase.firestore().collection('usuarios').doc(user.uid).set({
+            categorias: [selectedCategory] // Armazenar apenas a categoria selecionada
+          }, { merge: true });
+        }).then(() => {
+          alert('Perfil atualizado com sucesso!');
+        }).catch((error) => {
+          errorDiv.textContent = 'Erro ao atualizar perfil: ' + error.message;
         });
-    </script>
+      }
+    });
+
+    // Inicializa dados do usuário e perfis ao carregar a página
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        carregarDadosUsuario();
+        carregarPerfisCriancas();
+      }
+    });
+  </script>
 </body>
 
 </html>
