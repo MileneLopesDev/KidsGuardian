@@ -249,7 +249,33 @@
         <!-- Script Principal -->
         <script src="src/javascript/script.js"></script>
 
+        <script>
+            const urlParams = new URLSearchParams(window.location.search);
+const idade = parseInt(urlParams.get('idade'), 10);
 
+if (!isNaN(idade)) {
+    let faixaEtaria = '';
+    if (idade >= 0 && idade <= 2) faixaEtaria = 'faixaEtaria1';
+    else if (idade >= 3 && idade <= 5) faixaEtaria = 'faixaEtaria2';
+    else if (idade >= 6 && idade <= 10) faixaEtaria = 'faixaEtaria3';
+    else if (idade >= 11 && idade <= 18) faixaEtaria = 'faixaEtaria4';
+
+    if (faixaEtaria) {
+        const db = firebase.firestore();
+        db.collection(faixaEtaria).get()
+            .then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    console.log(`Conteúdo: ${data.nome || data.titulo}`);
+                });
+            })
+            .catch((error) => {
+                console.error("Erro ao buscar conteúdos:", error);
+            });
+    }
+}
+
+        </script>
 
     </body>
 

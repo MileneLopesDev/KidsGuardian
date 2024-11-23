@@ -244,105 +244,108 @@ $(document).ready(function () {
     }
 });
 
-
 document.addEventListener("DOMContentLoaded", () => {
-    // Verificar se o Firebase foi inicializado corretamente
     if (!firebase || !firebase.auth || !firebase.firestore) {
-      console.error("Firebase não foi inicializado corretamente.");
-      return;
+        console.error("Firebase não foi inicializado corretamente.");
+        return;
     }
-  
-    // Monitorar estado de autenticação
+
     firebase.auth().onAuthStateChanged((user) => {
-      const loginNavItem = document.getElementById("loginNavItem");
-      const loginLink = loginNavItem.querySelector("a");
-  
-      if (user) {
-        const userName = user.displayName || user.email.split("@")[0];
-        loginLink.textContent = userName;
-        loginLink.href = "perfil.html";
-  
-        // Criar submenu para perfis
-        const subMenu = document.createElement("ul");
-        subMenu.className = "submenu";
-  
-        // Adiciona "Editar Perfil"
-        const editProfileItem = document.createElement("li");
-        editProfileItem.innerHTML = `<a href="editar-perfil.html">Editar Perfil</a>`;
-        subMenu.appendChild(editProfileItem);
-  
-        // Buscar perfis das crianças no Firestore
-        const db = firebase.firestore();
-        db.collection("usuarios")
-          .doc(user.uid)
-          .collection("childrenProfiles")
-          .get()
-          .then((querySnapshot) => {
-            if (!querySnapshot.empty) {
-              querySnapshot.forEach((doc) => {
-                const childProfile = doc.data();
-                const childId = doc.id;
-  
-                const listItem = document.createElement("li");
-                listItem.innerHTML = `
-                  <a href="editar-perfil-crianca.html?id=${childId}">
-                    ${childProfile.name} (${childProfile.age} anos)
-                  </a>
-                `;
-                subMenu.appendChild(listItem);
-              });
-            } else {
-              const noChildProfile = document.createElement("li");
-              noChildProfile.innerHTML = `
-                <a href="perfil-crianca.html">Criar Perfil da Criança</a>
-              `;
-              subMenu.appendChild(noChildProfile);
-            }
-  
-            // Adiciona logout
-            const logoutItem = document.createElement("li");
-            logoutItem.innerHTML = '<a href="#" id="logoutButton">Logout</a>';
-            subMenu.appendChild(logoutItem);
-  
-            document.getElementById("logoutButton").addEventListener("click", () => {
-              firebase.auth().signOut().then(() => {
+        const loginNavItem = document.getElementById("loginNavItem");
+        const loginLink = loginNavItem.querySelector("a");
+        const paraVoceTab = document.getElementById("paraVoceTab");
+
+        if (user) {
+            const userId = user.uid;
+            const db = firebase.firestore();
+
+            // Atualizar nome do usuário
+            const userName = user.displayName || user.email.split("@")[0];
+            loginLink.textContent = userName;
+            loginLink.href = "#";
+
+            // Criar submenu
+            const subMenu = document.createElement("ul");
+            subMenu.className = "submenu";
+
+            db.collection("usuarios").doc(userId).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        const userType = doc.data().categorias?.[0]; // Responsável ou Educador
+
+                        // Adicionar "Editar Perfil"
+                        const editProfileItem = document.createElement("li");
+                        editProfileItem.innerHTML = `<a href="editar-perfil.html">Editar Perfil</a>`;
+                        subMenu.appendChild(editProfileItem);
+
+                        if (userType === "Responsável") {
+                            // Responsável: Adicionar opções relacionadas à criança
+                            const createChildProfileItem = document.createElement("li");
+                            createChildProfileItem.innerHTML = `<a href="perfil-crianca.html">Criar Perfil da Criança</a>`;
+                            subMenu.appendChild(createChildProfileItem);
+
+                            // Buscar perfis das crianças
+                            db.collection("usuarios").doc(userId).collection("childrenProfiles").get()
+                                .then((querySnapshot) => {
+                                    querySnapshot.forEach((childDoc) => {
+                                        const child = childDoc.data();
+                                        const childItem = document.createElement("li");
+                                        childItem.innerHTML = `<a href="editar-perfil-crianca.html?id=${childDoc.id}">${child.name} (${child.age} anos)</a>`;
+                                        subMenu.appendChild(childItem);
+                                    });
+
+                                    appendLogout(subMenu);
+                                    loginNavItem.appendChild(subMenu);
+                                })
+                                .catch((error) => {
+                                    console.error("Erro ao carregar perfis de crianças:", error);
+                                });
+
+                            // Mostrar a aba "Para Você"
+                            paraVoceTab.style.display = "block";
+                            paraVoceTab.innerHTML = `<a href="para-voce.html">Para Você</a>`;
+                        } else if (userType === "Educador") {
+                            // Educador: Adicionar opções de faixa etária
+                            const faixaEtariaMenu = `
+                                <li><a href="para-voce.html?idade=0-2">Bebês (0-2 anos)</a></li>
+                                <li><a href="para-voce.html?idade=3-5">Crianças (3-5 anos)</a></li>
+                                <li><a href="para-voce.html?idade=6-10">Crianças (6-10 anos)</a></li>
+                                <li><a href="para-voce.html?idade=11-18">Adolescentes (11-18 anos)</a></li>
+                            `;
+                            paraVoceTab.style.display = "block";
+                            paraVoceTab.innerHTML = `<a href="#">Para Você</a><ul class="submenu">${faixaEtariaMenu}</ul>`;
+
+                            appendLogout(subMenu);
+                            loginNavItem.appendChild(subMenu);
+                        } else {
+                            console.error("Tipo de usuário não reconhecido.");
+                        }
+                    } else {
+                        console.error("Documento de usuário não encontrado.");
+                    }
+                })
+                .catch((error) => {
+                    console.error("Erro ao buscar dados do usuário:", error);
+                });
+        } else {
+            // Usuário não autenticado
+            paraVoceTab.style.display = "none";
+            loginLink.textContent = "Login";
+            loginLink.href = "login.html";
+        }
+    });
+
+    // Função para adicionar logout
+    function appendLogout(subMenu) {
+        const logoutItem = document.createElement("li");
+        logoutItem.innerHTML = `<a href="#" id="logoutButton">Logout</a>`;
+        subMenu.appendChild(logoutItem);
+
+        logoutItem.addEventListener("click", () => {
+            firebase.auth().signOut().then(() => {
                 alert("Você saiu.");
                 window.location.href = "index.html";
-              });
             });
-          })
-          .catch((error) => {
-            console.error("Erro ao carregar perfis de crianças:", error);
-          });
-  
-        loginNavItem.appendChild(subMenu);
-      } else {
-        loginLink.textContent = "Login";
-        loginLink.href = "login.html";
-      }
-    });
-  });
-  
-  // menu para voce
-  firebase.auth().onAuthStateChanged((user) => {
-    const paraVoceTab = document.getElementById('paraVoceTab');
-    const loginNavItem = document.getElementById('loginNavItem');
-    const loginLink = loginNavItem.querySelector('a');
-
-    if (user) {
-        // Mostra a aba "Para Você"
-        paraVoceTab.style.display = 'block';
-
-        // Atualiza o link de login para exibir o nome do usuário
-        const userName = user.displayName || user.email.split('@')[0];
-        loginLink.textContent = userName;
-        loginLink.href = "perfil.html";
-    } else {
-        // Esconde a aba "Para Você"
-        paraVoceTab.style.display = 'none';
-
-        // Atualiza o link de login para redirecionar ao login
-        loginLink.textContent = "Login";
-        loginLink.href = "login.html";
+        });
     }
 });
