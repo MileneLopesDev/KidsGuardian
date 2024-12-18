@@ -206,3 +206,15 @@ main ul li p strong {
     color: #007BFF;
     font-weight: bold;
 }
+
+.description {
+    max-height: 3em; /* Limita a altura inicial da descrição */
+    overflow: hidden;
+    transition: max-height 0.3s ease; /* Suaviza a transição */
+}
+
+.description.expanded {
+    max-height: none; /* Remove o limite ao expandir */
+}
+
+

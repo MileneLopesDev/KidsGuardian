@@ -254,6 +254,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const loginNavItem = document.getElementById("loginNavItem");
         const loginLink = loginNavItem.querySelector("a");
         const paraVoceTab = document.getElementById("paraVoceTab");
+        const controlesParentais = document.getElementById("controlesParentais");
 
         if (user) {
             const userId = user.uid;
@@ -270,59 +271,89 @@ document.addEventListener("DOMContentLoaded", () => {
 
             db.collection("usuarios").doc(userId).get()
                 .then((doc) => {
-                    if (doc.exists) {
-                        const userType = doc.data().categorias?.[0]; // Responsável ou Educador
+                    if (!doc.exists) {
+                        console.error(`Documento de usuário com ID '${userId}' não encontrado.`);
+                        return; // Parar a execução se o documento não existir
+                    }
 
-                        // Adicionar "Editar Perfil"
-                        const editProfileItem = document.createElement("li");
-                        editProfileItem.innerHTML = `<a href="editar-perfil.html">Editar Perfil</a>`;
-                        subMenu.appendChild(editProfileItem);
+                    const userData = doc.data();
+                    const userType = userData?.categorias?.[0]; // Responsável ou Educador
 
-                        if (userType === "Responsável") {
-                            // Responsável: Adicionar opções relacionadas à criança
-                            const createChildProfileItem = document.createElement("li");
-                            createChildProfileItem.innerHTML = `<a href="perfil-crianca.html">Criar Perfil da Criança</a>`;
-                            subMenu.appendChild(createChildProfileItem);
+                    // Adicionar "Editar Perfil"
+                    const editProfileItem = document.createElement("li");
+                    editProfileItem.innerHTML = `<a href="editar-perfil.html">Editar Perfil</a>`;
+                    subMenu.appendChild(editProfileItem);
 
-                            // Buscar perfis das crianças
-                            db.collection("usuarios").doc(userId).collection("childrenProfiles").get()
-                                .then((querySnapshot) => {
+                    if (userType === "Responsável") {
+                        // Adicionar opções relacionadas à criança
+                        const createChildProfileItem = document.createElement("li");
+                        createChildProfileItem.innerHTML = `<a href="perfil-crianca.html">Criar Perfil da Criança</a>`;
+                        subMenu.appendChild(createChildProfileItem);
+
+                        db.collection("usuarios").doc(userId).collection("childrenProfiles").get()
+                            .then((querySnapshot) => {
+                                if (querySnapshot.empty) {
+                                    console.log("Nenhum perfil de criança encontrado.");
+                                } else {
                                     querySnapshot.forEach((childDoc) => {
                                         const child = childDoc.data();
                                         const childItem = document.createElement("li");
                                         childItem.innerHTML = `<a href="editar-perfil-crianca.html?id=${childDoc.id}">${child.name} (${child.age} anos)</a>`;
                                         subMenu.appendChild(childItem);
                                     });
+                                }
 
-                                    appendLogout(subMenu);
-                                    loginNavItem.appendChild(subMenu);
-                                })
-                                .catch((error) => {
-                                    console.error("Erro ao carregar perfis de crianças:", error);
-                                });
+                                
+                                loginNavItem.appendChild(subMenu);
+                            })
+                            .catch((error) => {
+                                console.error("Erro ao carregar perfis de crianças:", error);
+                            });
 
-                            // Mostrar a aba "Para Você"
-                            paraVoceTab.style.display = "block";
-                            paraVoceTab.innerHTML = `<a href="para-voce.html">Para Você</a>`;
-                        } else if (userType === "Educador") {
-                            // Educador: Adicionar opções de faixa etária
-                            const faixaEtariaMenu = `
-                                <li><a href="para-voce.html?idade=0-2">Bebês (0-2 anos)</a></li>
-                                <li><a href="para-voce.html?idade=3-5">Crianças (3-5 anos)</a></li>
-                                <li><a href="para-voce.html?idade=6-10">Crianças (6-10 anos)</a></li>
-                                <li><a href="para-voce.html?idade=11-18">Adolescentes (11-18 anos)</a></li>
-                            `;
-                            paraVoceTab.style.display = "block";
-                            paraVoceTab.innerHTML = `<a href="#">Para Você</a><ul class="submenu">${faixaEtariaMenu}</ul>`;
+                        // Mostrar a aba "Para Você"
+                        paraVoceTab.style.display = "block";
+                        paraVoceTab.innerHTML = `<a href="para-voce.html">Para Você</a>`;
+                    } else if (userType === "Educador") {
+                        // Substituir "Controles Parentais" por "Recursos Educacionais"
+                        if (controlesParentais) {
+                            const recursosEducacionaisItem = document.createElement("li");
+                            recursosEducacionaisItem.className = "nav-item";
+                            recursosEducacionaisItem.id = "recursosEducacionais";
+                            recursosEducacionaisItem.innerHTML = `<a href="#">Recursos Educacionais</a>`;
 
-                            appendLogout(subMenu);
-                            loginNavItem.appendChild(subMenu);
-                        } else {
-                            console.error("Tipo de usuário não reconhecido.");
+                            const faixaEtariaMenu = document.createElement("ul");
+                            faixaEtariaMenu.classList.add("submenu");
+
+                            const faixasEtarias = [
+                                { idade: "0-2", titulo: "Bebês (0-2 anos)" },
+                                { idade: "3-5", titulo: "Crianças (3-5 anos)" },
+                                { idade: "6-10", titulo: "Crianças (6-10 anos)" },
+                                { idade: "11-18", titulo: "Adolescentes (11-18 anos)" },
+                            ];
+
+                            faixasEtarias.forEach((faixa) => {
+                                const faixaItem = document.createElement("li");
+                                faixaItem.innerHTML = `<a href="recursos-educacionais.html?idade=${faixa.idade}">${faixa.titulo}</a>`;
+                                faixaEtariaMenu.appendChild(faixaItem);
+                            });
+
+                            recursosEducacionaisItem.appendChild(faixaEtariaMenu);
+
+                            // Substituir o elemento "controlesParentais"
+                            controlesParentais.replaceWith(recursosEducacionaisItem);
+                        }
+
+                        // ocultar "Para Você"
+                        if (paraVoceTab) {
+                            paraVoceTab.style.display = "none";
                         }
                     } else {
-                        console.error("Documento de usuário não encontrado.");
+                        console.error("Tipo de usuário não reconhecido.");
                     }
+
+                    // Adicionar logout no final do submenu
+                    appendLogout(subMenu);
+                    loginNavItem.appendChild(subMenu);
                 })
                 .catch((error) => {
                     console.error("Erro ao buscar dados do usuário:", error);

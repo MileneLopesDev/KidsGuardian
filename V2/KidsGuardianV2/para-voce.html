@@ -61,7 +61,6 @@
                     const userId = user.uid;
                     const db = firebase.firestore();
 
-                    // Busca perfis das crianças associadas ao usuário
                     db.collection('usuarios').doc(userId).collection('childrenProfiles').get()
                         .then((querySnapshot) => {
                             if (!querySnapshot.empty) {
@@ -69,7 +68,6 @@
                                     const child = doc.data();
                                     const age = child.age;
 
-                                    // Determina a faixa etária
                                     let faixaEtaria = "";
                                     if (age >= 0 && age <= 2) faixaEtaria = "faixaEtaria1";
                                     else if (age >= 3 && age <= 5) faixaEtaria = "faixaEtaria2";
@@ -77,13 +75,11 @@
                                     else if (age >= 11 && age <= 18) faixaEtaria = "faixaEtaria4";
 
                                     if (faixaEtaria) {
-                                        // Cria um container para cada criança
                                         const childContainer = document.createElement('div');
                                         childContainer.className = 'child-container';
                                         childContainer.innerHTML = `<h2 class="child-title">Recomendações para ${child.name} (${child.age} anos)</h2>`;
                                         conteudosContainer.appendChild(childContainer);
 
-                                        // Busca os conteúdos para a faixa etária
                                         buscarConteudos(db, faixaEtaria, childContainer);
                                     }
                                 });
@@ -100,7 +96,6 @@
                 }
             });
 
-            // Função para buscar os conteúdos no Firestore
             function buscarConteudos(db, faixaEtaria, container) {
                 db.collection(faixaEtaria).get()
                     .then((querySnapshot) => {
@@ -110,41 +105,80 @@
 
                         querySnapshot.forEach((doc) => {
                             const data = doc.data();
-                            if (data.categoria === "livro") livros.push(data);
-                            else if (data.categoria === "filme") filmes.push(data);
-                            else if (data.categoria === "atividade") atividades.push(data);
+                            const descricao = data.descricao || data.sinopse;
+
+                            const descricaoLimitada = descricao.length > 100 ? descricao.slice(0, 100) + "..." : descricao;
+
+                            if (data.categoria === "livro") livros.push({ ...data, descricao: descricaoLimitada });
+                            else if (data.categoria === "filme") filmes.push({ ...data, descricao: descricaoLimitada });
+                            else if (data.categoria === "atividade") atividades.push({ ...data, descricao: descricaoLimitada });
                         });
 
-                        // Renderiza cada categoria
                         renderCategoria(container, "Livros", livros);
                         renderCategoria(container, "Filmes", filmes);
                         renderCategoria(container, "Atividades", atividades);
+
+                        adicionarEventosVerMais(); // Atualizado para funcionar globalmente
                     })
                     .catch((error) => {
                         console.error("Erro ao buscar conteúdos:", error);
                     });
             }
 
-            // Função para renderizar os conteúdos
             function renderCategoria(container, titulo, itens) {
                 if (itens.length === 0) return;
 
                 let html = `<h3>${titulo}</h3><ul>`;
                 itens.forEach((item) => {
+                    const descricao = item.descricao || "Descrição indisponível.";
+                    const descricaoMin = descricao.length > 100 ? descricao.slice(0, 100) + "..." : descricao;
+
+                    // Remove tags HTML das descrições para data-* (texto puro)
+                    const descricaoFullSafe = descricao.replace(/<\/?[^>]+(>|$)/g, ""); // Remove tags HTML
+                    const descricaoMinSafe = descricaoMin.replace(/<\/?[^>]+(>|$)/g, "");
+
                     html += `
-                        <li>
-                            <img src="${item.imagemURL}" alt="${item.titulo || item.nome}" width="100">
-                            <h4>${item.titulo || item.nome}</h4>
-                            <p>${item.descricao || item.sinopse}</p>
-                            ${item.categoria === "filme" ? `<p><strong>Classificação:</strong> ${item.idade} anos</p>` : ""}
-                        </li>`;
+            <li>
+                <img src="${item.imagemURL}" alt="${item.titulo || item.nome}" width="100">
+                <h4>${item.titulo || item.nome}</h4>
+                <p class="description" 
+                   data-full="${descricaoFullSafe}" 
+                   data-min="${descricaoMinSafe}">
+                   ${descricaoMinSafe}
+                </p>
+                <button class="see-more btn-default">Ver mais</button>
+                ${item.categoria === "livro" ? `<p><strong>Autor:</strong> ${item.autor}</p>` : ""}
+                ${item.categoria === "filme" ? `<p><strong>Classificação:</strong> ${item.idade} anos</p>` : ""}
+            </li>`;
                 });
                 html += `</ul>`;
 
                 container.innerHTML += html;
+
+                // Adicionando eventos ao botão "Ver mais"
+                container.querySelectorAll('.see-more').forEach(button => {
+                    button.addEventListener('click', toggleDescricao);
+                });
             }
+
+            function toggleDescricao(event) {
+                const button = event.target;
+                const description = button.closest('li').querySelector('.description');
+
+                // Verifica se a classe 'expanded' já está aplicada
+                const isExpanded = description.classList.toggle('expanded');
+
+                // Atualiza o texto do botão
+                button.textContent = isExpanded ? "Ver menos" : "Ver mais";
+            }
+
+
+
         });
     </script>
+
+
+
 </body>
 
 </html>
