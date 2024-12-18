@@ -124,53 +124,81 @@
                     });
             }
 
-            function renderCategoria(container, titulo, itens) {
-                if (itens.length === 0) return;
+            function buscarConteudos(db, faixaEtaria, container) {
+        db.collection(faixaEtaria).get()
+            .then((querySnapshot) => {
+                const livros = [];
+                const filmes = [];
+                const atividades = [];
 
-                let html = `<h3>${titulo}</h3><ul>`;
-                itens.forEach((item) => {
-                    const descricao = item.descricao || "Descrição indisponível.";
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const descricao = data.descricao || data.sinopse;
 
-                    // Remove tags HTML das descrições para data-* (texto puro)
-                    const descricaoFullSafe = descricao.replace(/<\/?[^>]+(>|$)/g, ""); // Remove tags HTML
-
-                    html += `
-                    <li>
-                        <img src="${item.imagemURL}" alt="${item.titulo || item.nome}" width="100">
-                        <h4>${item.titulo || item.nome}</h4>
-                        <p class="description">
-                            ${item.descricao || "Descrição indisponível."}
-                        </p>                        
-                        <button class="see-more btn-default">Ver mais</button>
-                    </li>
-                `;
-
+                    if (data.categoria === "livro") livros.push({ ...data, descricao });
+                    else if (data.categoria === "filme") filmes.push({ ...data, descricao });
+                    else if (data.categoria === "atividade") atividades.push({ ...data, descricao });
 
                 });
-                html += `</ul>`;
 
-                container.innerHTML += html;
+                renderCategoria(container, "Livros", livros);
+                renderCategoria(container, "Filmes", filmes);
+                renderCategoria(container, "Atividades", atividades);
+            })
+            .catch((error) => {
+                console.error("Erro ao buscar conteúdos:", error);
+            });
+    }
 
-                // Adicionando eventos ao botão "Ver mais"
-                container.querySelectorAll('.see-more').forEach(button => {
-                    button.addEventListener('click', toggleDescricao);
-                });
-            }
+    // Função para renderizar cada categoria (livros, filmes, atividades)
+    function renderCategoria(container, titulo, itens) {
+        if (itens.length === 0) return;
 
+        let html = `<h3>${titulo}</h3><ul>`;
+        itens.forEach((item) => {
+            const descricao = item.descricao || "Descrição indisponível.";
 
-            function toggleDescricao(event) {
-                const button = event.target;
-                const description = button.closest('li').querySelector('.description');
-                if (description.classList.contains('visible')) {
-                    description.classList.remove('visible');
-                    button.textContent = "Ver mais";
-                } else {
-                    description.classList.add('visible');
-                    button.textContent = "Ver menos";
-                }
+            // Remove tags HTML das descrições para segurança
+            const descricaoFullSafe = descricao.replace(/<\/?[^>]+(>|$)/g, ""); // Remove tags HTML
 
-            }
+            html += `
+            <li>
+                <img src="${item.imagemURL}" alt="${item.titulo || item.nome}" width="100">
+                <h4>${item.titulo || item.nome}</h4>
+                <div class="collapse-container">
+                    <div class="description-container">
+                        <p class="description">${descricaoFullSafe}</p>
+                    </div>
+                    <button class="collapse-btn btn-default">Ver mais</button>
+                     ${item.categoria === "livro" ? `<p><strong>Autor:</strong> ${item.autor}</p>` : ""}
+                ${item.categoria === "filme" ? `<p><strong>Classificação:</strong> ${item.idade} anos</p>` : ""}
+                </div>
+            </li>
+            `;
+        });
+        html += `</ul>`;
 
+        container.innerHTML += html;
+
+        // Adicionando eventos ao botão "Ver mais"
+        container.querySelectorAll('.collapse-btn').forEach(button => {
+            button.addEventListener('click', toggleCollapse);
+        });
+    }
+
+    // Função para alternar a visibilidade da descrição
+    function toggleCollapse(event) {
+        const button = event.target;
+        const description = button.closest('.collapse-container').querySelector('.description');
+
+        if (description.classList.contains('visible')) {
+            description.classList.remove('visible');
+            button.textContent = "Ver mais";
+        } else {
+            description.classList.add('visible');
+            button.textContent = "Ver menos";
+        }
+    }
 
 
         });
