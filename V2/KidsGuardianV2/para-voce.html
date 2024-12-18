@@ -107,11 +107,10 @@
                             const data = doc.data();
                             const descricao = data.descricao || data.sinopse;
 
-                            const descricaoLimitada = descricao.length > 100 ? descricao.slice(0, 100) + "..." : descricao;
+                            if (data.categoria === "livro") livros.push({ ...data, descricao });
+                            else if (data.categoria === "filme") filmes.push({ ...data, descricao });
+                            else if (data.categoria === "atividade") atividades.push({ ...data, descricao });
 
-                            if (data.categoria === "livro") livros.push({ ...data, descricao: descricaoLimitada });
-                            else if (data.categoria === "filme") filmes.push({ ...data, descricao: descricaoLimitada });
-                            else if (data.categoria === "atividade") atividades.push({ ...data, descricao: descricaoLimitada });
                         });
 
                         renderCategoria(container, "Livros", livros);
@@ -131,25 +130,22 @@
                 let html = `<h3>${titulo}</h3><ul>`;
                 itens.forEach((item) => {
                     const descricao = item.descricao || "Descrição indisponível.";
-                    const descricaoMin = descricao.length > 100 ? descricao.slice(0, 100) + "..." : descricao;
 
                     // Remove tags HTML das descrições para data-* (texto puro)
                     const descricaoFullSafe = descricao.replace(/<\/?[^>]+(>|$)/g, ""); // Remove tags HTML
-                    const descricaoMinSafe = descricaoMin.replace(/<\/?[^>]+(>|$)/g, "");
 
                     html += `
-            <li>
-                <img src="${item.imagemURL}" alt="${item.titulo || item.nome}" width="100">
-                <h4>${item.titulo || item.nome}</h4>
-                <p class="description" 
-                   data-full="${descricaoFullSafe}" 
-                   data-min="${descricaoMinSafe}">
-                   ${descricaoMinSafe}
-                </p>
-                <button class="see-more btn-default">Ver mais</button>
-                ${item.categoria === "livro" ? `<p><strong>Autor:</strong> ${item.autor}</p>` : ""}
-                ${item.categoria === "filme" ? `<p><strong>Classificação:</strong> ${item.idade} anos</p>` : ""}
-            </li>`;
+                    <li>
+                        <img src="${item.imagemURL}" alt="${item.titulo || item.nome}" width="100">
+                        <h4>${item.titulo || item.nome}</h4>
+                        <p class="description">
+                            ${item.descricao || "Descrição indisponível."}
+                        </p>                        
+                        <button class="see-more btn-default">Ver mais</button>
+                    </li>
+                `;
+
+
                 });
                 html += `</ul>`;
 
@@ -161,15 +157,18 @@
                 });
             }
 
+
             function toggleDescricao(event) {
                 const button = event.target;
                 const description = button.closest('li').querySelector('.description');
+                if (description.classList.contains('visible')) {
+                    description.classList.remove('visible');
+                    button.textContent = "Ver mais";
+                } else {
+                    description.classList.add('visible');
+                    button.textContent = "Ver menos";
+                }
 
-                // Verifica se a classe 'expanded' já está aplicada
-                const isExpanded = description.classList.toggle('expanded');
-
-                // Atualiza o texto do botão
-                button.textContent = isExpanded ? "Ver menos" : "Ver mais";
             }
 
 

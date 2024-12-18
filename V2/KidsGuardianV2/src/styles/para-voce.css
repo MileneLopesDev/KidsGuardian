@@ -32,7 +32,13 @@ main h1 {
     color: #f27365;
     font-size: 22px;
     margin-bottom: 20px;
+}.description {
+    display: none; /* Ocultar inicialmente */
+    white-space: normal; /* Permitir quebra de linha */
+    overflow: visible;
+    transition: all 0.3s ease-in-out;
 }
+
 
 /* Estilo das listas */
 .child-container ul {
@@ -208,13 +214,11 @@ main ul li p strong {
 }
 
 .description {
-    max-height: 3em; /* Limita a altura inicial da descrição */
-    overflow: hidden;
-    transition: max-height 0.3s ease; /* Suaviza a transição */
+    display: none; /* Ocultar inicialmente */
+    white-space: normal; /* Permitir quebra de linha */
+    overflow: visible;
+    transition: all 0.3s ease-in-out;
 }
 
-.description.expanded {
-    max-height: none; /* Remove o limite ao expandir */
-}
 
 
