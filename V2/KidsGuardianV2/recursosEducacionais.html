@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="src/styles/styles.css">
+    <link rel="stylesheet" href="src/styles/para-voce.css">
+    <link rel="icon" type="image/png" href="src/images/icon.png">
+    <title>KG - Para Você</title>
+</head>
+
+<body>
+    <header>
+        <nav id="navbar">
+            <div class="logo"><img src="src/images/logo.png" alt="Logo"></div>
+            <ul id="nav_list">
+                <li class="nav-item"><a href="index.html">Inicio</a></li>
+                <li class="nav-item"><a href="explorar.html">Explore</a></li>
+                <li class="nav-item active"><a href="para-voce.html">Para Você</a></li>
+                <li class="nav-item" id="loginNavItem"><a href="login.html">Login</a></li>
+            </ul>
+            <button id="mobile_btn"><i class="fa-solid fa-bars"></i></button>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Conteúdos Recomendados</h1>
+        <div id="conteudos">
+            
+        </div>
+    </main>
+
+    <footer>
+        <img src="src/images/wave.svg" alt="Wave">
+        <div id="footer_items">
+            <span>&copy; 2024 Milene Lopes</span>
+        </div>
+    </footer>
+
+    <!-- Firebase App SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+
+    <!-- Firebase Auth SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+
+    <!-- Firebase Firestore SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
+
+    <!-- Configuração do Firebase -->
+    <script src="src/javascript/firebase-config.js"></script>
+
+    <!-- Script Principal -->
+    <script src="src/javascript/script.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Função para obter parâmetros da URL
+            function getQueryParam(param) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(param);
+            }
+        
+            // Obtém o parâmetro 'idade' da URL
+            const faixaEtaria = getQueryParam('idade');
+            const artigosContainer = document.getElementById('conteudos');
+            artigosContainer.innerHTML = ""; // Limpa o container
+        
+            if (faixaEtaria) {
+                const [minIdade, maxIdade] = faixaEtaria.split('-').map(Number);
+        
+                if (isNaN(minIdade) || isNaN(maxIdade)) {
+                    artigosContainer.innerHTML = "<p>Faixa etária inválida.</p>";
+                } else {
+                    buscarArtigos(minIdade, maxIdade);
+                }
+            } else {
+                artigosContainer.innerHTML = "<p>Parâmetro de faixa etária não fornecido.</p>";
+            }
+        
+            // Função para buscar artigos no Firestore
+            async function buscarArtigos(minIdade, maxIdade) {
+                if (typeof db !== 'undefined') {
+                    const faixaIdades = Array.from(
+                        { length: maxIdade - minIdade + 1 },
+                        (_, i) => i + minIdade
+                    );
+        
+                    try {
+                        // Consulta para faixa etária
+                        const idadeQuery = await db
+                            .collection('artigos')
+                            .where('idade', 'array-contains-any', faixaIdades)
+                            .get();
+        
+                        // Filtrar artigos localmente com a keyword "educação"
+                        const artigosFiltrados = [];
+                        idadeQuery.forEach((doc) => {
+                            const artigo = doc.data();
+                            if (artigo.keywords && artigo.keywords.includes('educação')) {
+                                artigosFiltrados.push({ id: doc.id, ...artigo });
+                            }
+                        });
+        
+                        // Verifica se há resultados
+                        if (artigosFiltrados.length === 0) {
+                            artigosContainer.innerHTML = "<p>Nenhum artigo encontrado para esta faixa etária e palavra-chave.</p>";
+                        } else {
+                            artigosFiltrados.forEach((artigo) => {
+                                artigosContainer.innerHTML += `
+                                    <div class="artigo" data-id="${artigo.id}">
+                                        <h2>${artigo.titulo}</h2>
+                                        <p><strong>Idades:</strong> ${artigo.idade.join(', ')}</p>
+                                        <p>${artigo.conteudo.substring(0, 150)}...</p>
+                                        <a href="detalhes-artigos.html?id=${artigo.id}" class="btn-default">Leia mais</a>
+                                    </div>
+                                `;
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Erro ao buscar artigos:', error);
+                        artigosContainer.innerHTML = "<p>Erro ao carregar os artigos.</p>";
+                    }
+                } else {
+                    artigosContainer.innerHTML = "<p>Banco de dados não configurado.</p>";
+                }
+            }
+        });
+        
+        
+    </script>
+    
+
+</body>
+
+</html>

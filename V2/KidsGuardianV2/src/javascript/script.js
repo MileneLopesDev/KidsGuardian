@@ -333,7 +333,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                             faixasEtarias.forEach((faixa) => {
                                 const faixaItem = document.createElement("li");
-                                faixaItem.innerHTML = `<a href="recursos-educacionais.html?idade=${faixa.idade}">${faixa.titulo}</a>`;
+                                faixaItem.innerHTML = `<a href="recursosEducacionais.html?idade=${faixa.idade}">${faixa.titulo}</a>`;
                                 faixaEtariaMenu.appendChild(faixaItem);
                             });
 
