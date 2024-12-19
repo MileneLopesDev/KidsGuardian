@@ -53,78 +53,54 @@
 
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const conteudosContainer = document.getElementById('conteudos');
+document.addEventListener("DOMContentLoaded", () => {
+    const conteudosContainer = document.getElementById('conteudos');
 
-            firebase.auth().onAuthStateChanged((user) => {
-                if (user) {
-                    const userId = user.uid;
-                    const db = firebase.firestore();
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+            const userId = user.uid;
+            const db = firebase.firestore();
 
-                    db.collection('usuarios').doc(userId).collection('childrenProfiles').get()
-                        .then((querySnapshot) => {
-                            if (!querySnapshot.empty) {
-                                querySnapshot.forEach((doc) => {
-                                    const child = doc.data();
-                                    const age = child.age;
-
-                                    let faixaEtaria = "";
-                                    if (age >= 0 && age <= 2) faixaEtaria = "faixaEtaria1";
-                                    else if (age >= 3 && age <= 5) faixaEtaria = "faixaEtaria2";
-                                    else if (age >= 6 && age <= 10) faixaEtaria = "faixaEtaria3";
-                                    else if (age >= 11 && age <= 18) faixaEtaria = "faixaEtaria4";
-
-                                    if (faixaEtaria) {
-                                        const childContainer = document.createElement('div');
-                                        childContainer.className = 'child-container';
-                                        childContainer.innerHTML = `<h2 class="child-title">Recomendações para ${child.name} (${child.age} anos)</h2>`;
-                                        conteudosContainer.appendChild(childContainer);
-
-                                        buscarConteudos(db, faixaEtaria, childContainer);
-                                    }
-                                });
-                            } else {
-                                conteudosContainer.innerHTML = '<p>Nenhum perfil de criança encontrado.</p>';
-                            }
-                        })
-                        .catch((error) => {
-                            console.error("Erro ao buscar perfis de crianças:", error);
-                        });
-                } else {
-                    alert('Você precisa estar logado para acessar esta página.');
-                    window.location.href = 'login.html';
-                }
-            });
-
-            function buscarConteudos(db, faixaEtaria, container) {
-                db.collection(faixaEtaria).get()
-                    .then((querySnapshot) => {
-                        const livros = [];
-                        const filmes = [];
-                        const atividades = [];
-
+            db.collection('usuarios').doc(userId).collection('childrenProfiles').get()
+                .then((querySnapshot) => {
+                    if (!querySnapshot.empty) {
                         querySnapshot.forEach((doc) => {
-                            const data = doc.data();
-                            const descricao = data.descricao || data.sinopse;
+                            const child = doc.data();
+                            const age = child.age;
+                            const preferences = child.preferences || [];
 
-                            if (data.categoria === "livro") livros.push({ ...data, descricao });
-                            else if (data.categoria === "filme") filmes.push({ ...data, descricao });
-                            else if (data.categoria === "atividade") atividades.push({ ...data, descricao });
+                            let faixaEtaria = "";
+                            if (age >= 0 && age <= 2) faixaEtaria = "faixaEtaria1";
+                            else if (age >= 3 && age <= 5) faixaEtaria = "faixaEtaria2";
+                            else if (age >= 6 && age <= 10) faixaEtaria = "faixaEtaria3";
+                            else if (age >= 11 && age <= 18) faixaEtaria = "faixaEtaria4";
 
+                            if (faixaEtaria) {
+                                const childContainer = document.createElement('div');
+                                childContainer.className = 'child-container';
+                                childContainer.innerHTML = `<h2 class="child-title">Recomendações para ${child.name} (${child.age} anos)</h2>`;
+                                conteudosContainer.appendChild(childContainer);
+
+                                // Buscando e exibindo os conteúdos (livros, filmes, atividades)
+                                buscarConteudos(db, faixaEtaria, childContainer);
+                                // Buscando e exibindo artigos
+                                buscarArtigos(db, preferences, childContainer);
+                            }
                         });
+                    } else {
+                        conteudosContainer.innerHTML = '<p>Nenhum perfil de criança encontrado.</p>';
+                    }
+                })
+                .catch((error) => {
+                    console.error("Erro ao buscar perfis de crianças:", error);
+                });
+        } else {
+            alert('Você precisa estar logado para acessar esta página.');
+            window.location.href = 'login.html';
+        }
+    });
 
-                        renderCategoria(container, "Livros", livros);
-                        renderCategoria(container, "Filmes", filmes);
-                        renderCategoria(container, "Atividades", atividades);
-
-                        adicionarEventosVerMais(); // Atualizado para funcionar globalmente
-                    })
-                    .catch((error) => {
-                        console.error("Erro ao buscar conteúdos:", error);
-                    });
-            }
-
-            function buscarConteudos(db, faixaEtaria, container) {
+    function buscarConteudos(db, faixaEtaria, container) {
         db.collection(faixaEtaria).get()
             .then((querySnapshot) => {
                 const livros = [];
@@ -138,15 +114,50 @@
                     if (data.categoria === "livro") livros.push({ ...data, descricao });
                     else if (data.categoria === "filme") filmes.push({ ...data, descricao });
                     else if (data.categoria === "atividade") atividades.push({ ...data, descricao });
-
                 });
 
                 renderCategoria(container, "Livros", livros);
                 renderCategoria(container, "Filmes", filmes);
                 renderCategoria(container, "Atividades", atividades);
+
+                // Depois que os conteúdos são renderizados, adicionar os eventos de "Ver mais"
+                adicionarEventosVerMais();
             })
             .catch((error) => {
                 console.error("Erro ao buscar conteúdos:", error);
+            });
+    }
+
+    function buscarArtigos(db, preferences, container) {
+        if (preferences.length === 0) {
+            container.innerHTML += `<p>Não há preferências cadastradas para buscar artigos.</p>`;
+            return;
+        }
+
+        db.collection("artigos").get()
+            .then((querySnapshot) => {
+                const artigosFiltrados = [];
+
+                querySnapshot.forEach((doc) => {
+                    const artigo = doc.data();
+                    if (Array.isArray(artigo.keywords) && artigo.keywords.some(keyword => preferences.includes(keyword))) {
+                        artigosFiltrados.push({ id: doc.id, ...artigo });
+                    }
+                });
+
+                if (artigosFiltrados.length > 0) {
+                    renderArtigo(container, "Artigos", artigosFiltrados, preferences);
+                } else {
+                    container.innerHTML += `<p>Nenhum artigo encontrado com base nas preferências.</p>`;
+                }
+
+                // Garantir que os eventos "Ler Artigo" sejam atribuídos após a renderização
+                setTimeout(() => {
+                    adicionarEventosLerArtigo();
+                }, 0);
+            })
+            .catch((error) => {
+                console.error("Erro ao buscar artigos:", error);
             });
     }
 
@@ -157,8 +168,6 @@
         let html = `<h3>${titulo}</h3><ul>`;
         itens.forEach((item) => {
             const descricao = item.descricao || "Descrição indisponível.";
-
-            // Remove tags HTML das descrições para segurança
             const descricaoFullSafe = descricao.replace(/<\/?[^>]+(>|$)/g, ""); // Remove tags HTML
 
             html += `
@@ -171,7 +180,7 @@
                     </div>
                     <button class="collapse-btn btn-default">Ver mais</button>
                      ${item.categoria === "livro" ? `<p><strong>Autor:</strong> ${item.autor}</p>` : ""}
-                ${item.categoria === "filme" ? `<p><strong>Classificação:</strong> ${item.idade} anos</p>` : ""}
+                     ${item.categoria === "filme" ? `<p><strong>Classificação:</strong> ${item.idade} anos</p>` : ""}
                 </div>
             </li>
             `;
@@ -179,11 +188,6 @@
         html += `</ul>`;
 
         container.innerHTML += html;
-
-        // Adicionando eventos ao botão "Ver mais"
-        container.querySelectorAll('.collapse-btn').forEach(button => {
-            button.addEventListener('click', toggleCollapse);
-        });
     }
 
     // Função para alternar a visibilidade da descrição
@@ -200,8 +204,53 @@
         }
     }
 
+    // Função para renderizar os artigos
+    function renderArtigo(container, titulo, artigos, preferences) {
+        if (artigos.length === 0) return;
 
+        let html = `<h3>${titulo}</h3><ul>`;
+        artigos.forEach((artigo) => {
+            const tituloSafe = artigo.titulo.replace(/<\/?[^>]+(>|$)/g, "");
+
+            html += `
+        <li>
+            <img src="${artigo.imagemURL}" alt="${tituloSafe}" width="100">
+            <h4>${tituloSafe}</h4>
+            <p><strong>Interesses da criança:</strong> ${preferences.join(', ')}</p>
+            <button class="ler-artigo-btn btn-default" data-id="${artigo.id}">Ler Artigo</button>
+        </li>
+        `;
         });
+        html += `</ul>`;
+
+        container.innerHTML += html;
+    }
+
+    // Adicionar eventos para "Ler Artigo"
+    function adicionarEventosLerArtigo() {
+        const buttons = document.querySelectorAll('.ler-artigo-btn');
+        buttons.forEach((button) => {
+            button.addEventListener('click', function () {
+                const artigoId = button.getAttribute('data-id');
+                if (artigoId) {
+                    window.location.href = `detalhes-artigos.html?id=${artigoId}`;
+                } else {
+                    console.error("ID do artigo não encontrado!");
+                }
+            });
+        });
+    }
+
+    // Adicionar eventos para "Ver mais"
+    function adicionarEventosVerMais() {
+        const buttons = document.querySelectorAll('.collapse-btn');
+        buttons.forEach((button) => {
+            button.addEventListener('click', toggleCollapse);
+        });
+    }
+});
+
+
     </script>
 
 

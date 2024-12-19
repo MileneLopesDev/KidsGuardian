@@ -124,7 +124,7 @@
   
 /* Container para o conteúdo */
 .container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 10px auto;
   background: white;
   padding: 20px;
@@ -156,6 +156,7 @@
 /* Alinhar parágrafos (texto normal) à esquerda */
 .container p {
   text-align: left;
+  margin-left: 20px;
 }
 
 
