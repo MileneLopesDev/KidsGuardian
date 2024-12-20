@@ -13,7 +13,7 @@
 }
 
 #cta .title{
-    font-size: 4rem;
+    font-size: 4.3rem;
     color: var(--color-neutral-1);
     text-align: left;
 }
@@ -23,7 +23,7 @@
 }
 
 #cta .description {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
     text-align: left;
 }
 
@@ -63,7 +63,7 @@
 #banner img{
         width: 100%; /* Ajuste essa porcentagem conforme desejado */
         height: auto; /* Man5tém a proporção da imagem */
-        max-width: 600px; /* Define um limite máximo, se necessário */
+        max-width: 800px; /* Define um limite máximo, se necessário */
 }
 
 .shape {
@@ -76,6 +76,16 @@
     right: 0;
     z-index: 1;
 }
+
+
+
+#recomendations_content .btn-default {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
 
 @media screen and (max-width: 1170px){
     #home{

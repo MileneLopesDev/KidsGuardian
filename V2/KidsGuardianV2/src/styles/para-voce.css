@@ -165,7 +165,7 @@ main ul li p {
     margin-bottom: 10px;
 }
 
-/* Responsividade para dispositivos menores */
+
 @media (max-width: 768px) {
     main ul {
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -181,7 +181,6 @@ main ul li p {
     }
 }
 
-/* Estilo para o botão voltar ou mensagem vazia */
 main .message {
     text-align: center;
     margin-top: 20px;
@@ -207,38 +206,52 @@ main .no-content {
     margin-top: 20px;
 }
 
-/* Estilo adicional para a idade recomendada nos filmes */
+
 main ul li p strong {
-    color: #007BFF;
+    color: var(--color-primary-4);
     font-weight: bold;
 }
 
+.collapse-container {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+    text-align: center;
+}
+
+/* Estilo para o botão */
+.collapse-btn {
+    margin-top: 10px; 
+    padding: 10px 14px; 
+    background-color: var(--color-primary-3); 
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0px 0px 10px 2px rgba(0,0,0,0.1 );
+    transition: background-color 0.3s ease;
+    
+}
+
+.collapse-btn:hover {
+    background-color: var(--color-primary-4);
+}
+
+
 .collapse-container .description {
-    display: none; /* Esconde o conteúdo por padrão */
+    display: none; 
     font-size: 14px;
     color: #333;
+    margin-bottom: 10px;
 }
 
 .collapse-container .description.visible {
-    display: block; /* Exibe o conteúdo quando a classe 'visible' for adicionada */
+    display: block; 
 }
 
-.collapse-container .collapse-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #115982; /* Cor do botão */
-    color: white;
-    padding: 5px 10px;
-    border: none;
-    cursor: pointer;
-    margin-top: 10px;
 
-}
-
-.collapse-container .collapse-btn:hover {
-    background-color: #f27365; /* Cor do botão quando hover */
-}
 
 
 

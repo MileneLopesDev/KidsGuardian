@@ -65,6 +65,7 @@
             <p id="conteudoArtigo"></p>
             <p id="dataArtigo"></p>
             <p><strong>Créditos:</strong> <span id="creditosArtigo"></span></p>
+            <p><strong>Fonte:</strong><span id="fonteArtigo" ></span> </p>
         </div>
     </main>
 
@@ -115,6 +116,7 @@
                             document.getElementById('imagemArtigo').src = artigo.imagemURL || 'src/images/default-image.png';
                             document.getElementById('conteudoArtigo').innerHTML = artigo.conteudo;
                             document.getElementById('creditosArtigo').textContent = artigo.creditos;
+                            document.getElementById('fonteArtigo').innerHTML = artigo.fonte;
 
                             // Formatar a data, se existir
                             if (artigo.data) {
