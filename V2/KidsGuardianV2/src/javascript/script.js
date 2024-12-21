@@ -88,7 +88,7 @@ $(document).ready(function () {
                             artigosContainer.append(`
                                 <div class="artigo" data-id="${doc.id}">
                                     <h2>${artigo.titulo}</h2>
-                                    <p><strong>Idade:</strong> ${artigo.idade.join(', ')}</p>
+                                    <p><strong>Idades:</strong> ${artigo.idade.join(', ')}</p>
                                     <p>${artigo.conteudo.substring(0, 150)}...</p>
                                     <a href="detalhes-artigos.html?id=${doc.id}" class="btn-default">Leia mais</a>
                                 </div>

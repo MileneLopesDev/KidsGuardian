@@ -17,8 +17,7 @@
             <ul id="nav_list">
                 <li class="nav-item"><a href="index.html">Inicio</a></li>
                 <li class="nav-item"><a href="explorar.html">Explore</a></li>
-                <li class="nav-item active"><a href="para-voce.html">Para Você</a></li>
-                <li class="nav-item" id="loginNavItem"><a href="login.html">Login</a></li>
+               
             </ul>
             <button id="mobile_btn"><i class="fa-solid fa-bars"></i></button>
         </nav>
@@ -216,7 +215,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <li>
             <img src="${artigo.imagemURL}" alt="${tituloSafe}" width="100">
             <h4>${tituloSafe}</h4>
-            <p><strong>Interesses da criança:</strong> ${preferences.join(', ')}</p>
+            <p><strong>Interesses da criança:</strong> ${artigo.keywords.join(', ')}</p>
             <button class="ler-artigo-btn btn-default" data-id="${artigo.id}">Ler Artigo</button>
         </li>
         `;
