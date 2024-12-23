@@ -15,7 +15,7 @@
             <div class="logo"><img src="src/images/logo.png" alt="Logo"></div>
             <ul id="nav_list">
                 <li class="nav-item active"><a href="index.html">Inicio</a></li>
-                
+
             </ul>
             <button id="mobile_btn"><i class="fa-solid fa-bars"></i></button>
         </nav>
@@ -26,22 +26,22 @@
         <form id="signupForm">
             <label for="email">Email:</label>
             <input type="email" id="email" required>
-            
+
             <label for="name">Nome:</label>
             <input type="text" id="displayName" required>
-            
+
             <label for="password">Senha:</label>
             <input type="password" id="password" required>
-            
+
             <label for="confirmPassword">Confirmar Senha:</label>
             <input type="password" id="confirmPassword" required>
-            
+
             <label>Você é:</label>
             <div class="checkbox" id="categoria">
                 <label><input type="radio" name="categoria" value="Responsável" required> Responsável</label>
                 <label><input type="radio" name="categoria" value="Educador" required> Educador</label>
             </div>
-            
+
             <button class="btn-default" type="submit">Cadastrar</button>
         </form>
         <p>Já tem uma conta? <a href="login.html">Faça login</a></p>
@@ -59,7 +59,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-firestore.js"></script>
-    
+
     <!-- Configuração do Firebase -->
     <script src="src/javascript/firebase-config.js"></script>
 
@@ -105,8 +105,19 @@
                 })
                 .catch((error) => {
                     console.error('Erro ao criar conta:', error);
-                    errorDiv.textContent = 'Erro: ' + error.message;
+
+                    // Tratar o erro com base no código
+                    if (error.code === 'auth/email-already-in-use') {
+                        errorDiv.textContent = 'O email informado já está sendo utilizado. Por favor, use outro email.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorDiv.textContent = 'O email informado é inválido. Por favor, tente novamente.';
+                    } else if (error.code === 'auth/weak-password') {
+                        errorDiv.textContent = 'A senha é muito fraca. Por favor, use pelo menos 6 caracteres.';
+                    } else {
+                        errorDiv.textContent = 'Erro ao criar conta: ' + error.message;
+                    }
                 });
+
         });
     </script>
 </body>

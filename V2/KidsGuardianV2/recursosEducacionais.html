@@ -17,8 +17,7 @@
             <ul id="nav_list">
                 <li class="nav-item"><a href="index.html">Inicio</a></li>
                 <li class="nav-item"><a href="explorar.html">Explore</a></li>
-                <li class="nav-item active"><a href="para-voce.html">Para Você</a></li>
-                <li class="nav-item" id="loginNavItem"><a href="login.html">Login</a></li>
+                
             </ul>
             <button id="mobile_btn"><i class="fa-solid fa-bars"></i></button>
         </nav>
@@ -27,7 +26,11 @@
     <main>
         <h1>Conteúdos Recomendados</h1>
         <div id="conteudos">
-            
+
+        </div>
+        <h1>Artigos Recomendados</h1>
+        <div id="conteudos2">
+
         </div>
     </main>
 
@@ -55,39 +58,38 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Função para obter parâmetros da URL
             function getQueryParam(param) {
                 const urlParams = new URLSearchParams(window.location.search);
                 return urlParams.get(param);
             }
-    
-            // Obtém o parâmetro 'idade' da URL
+
             const faixaEtaria = getQueryParam('idade');
             const conteudosContainer = document.getElementById('conteudos');
+            const artigosContainer = document.getElementById('conteudos2');
+
             conteudosContainer.innerHTML = ""; // Limpa o container
-    
+            artigosContainer.innerHTML = ""; // Limpa o container
+
             if (faixaEtaria) {
                 const [minIdade, maxIdade] = faixaEtaria.split('-').map(Number);
-    
+
                 if (isNaN(minIdade) || isNaN(maxIdade)) {
                     conteudosContainer.innerHTML = "<p>Faixa etária inválida.</p>";
                 } else {
-                    // Identifica a coleção da faixa etária
                     const faixaEtariaColecao = identificarFaixaEtaria(minIdade, maxIdade);
-    
+
                     if (faixaEtariaColecao) {
                         buscarConteudos(faixaEtariaColecao, conteudosContainer);
                     } else {
                         conteudosContainer.innerHTML = "<p>Faixa etária fora do intervalo suportado.</p>";
                     }
-    
-                    buscarArtigos(minIdade, maxIdade);
+
+                    buscarArtigos(minIdade, maxIdade, artigosContainer);
                 }
             } else {
                 conteudosContainer.innerHTML = "<p>Parâmetro de faixa etária não fornecido.</p>";
             }
-    
-            // Função para identificar a coleção de faixa etária
+
             function identificarFaixaEtaria(minIdade, maxIdade) {
                 if (minIdade >= 0 && maxIdade <= 2) return "faixaEtaria1";
                 if (minIdade >= 3 && maxIdade <= 5) return "faixaEtaria2";
@@ -95,58 +97,24 @@
                 if (minIdade >= 11 && maxIdade <= 18) return "faixaEtaria4";
                 return null;
             }
-    
-            // Função para buscar artigos
-            async function buscarArtigos(minIdade, maxIdade) {
-    const faixaIdades = Array.from(
-        { length: maxIdade - minIdade + 1 },
-        (_, i) => i + minIdade
-    );
 
-    try {
-        const artigosQuery = await db
-            .collection('artigos')
-            .where('idade', 'array-contains-any', faixaIdades)
-            .get();
-
-        const artigos = [];
-        artigosQuery.forEach((doc) => {
-            const data = doc.data();
-            if (data.keywords && data.keywords.includes("educacao")) {
-                artigos.push({ id: doc.id, ...data });
-            }
-        });
-
-        if (artigos.length === 0) {
-            conteudosContainer.innerHTML += "<p>Nenhum artigo encontrado.</p>";
-        } else {
-            renderArtigos(conteudosContainer, "Artigos", artigos);
-        }
-    } catch (error) {
-        console.error('Erro ao buscar artigos:', error);
-        conteudosContainer.innerHTML += "<p>Erro ao carregar os artigos.</p>";
-    }
-}
-
-    
-            // Função para buscar conteúdos em uma coleção específica
             async function buscarConteudos(faixaEtaria, container) {
                 try {
                     const querySnapshot = await db.collection(faixaEtaria).get();
-    
+
                     const livros = [];
                     const filmes = [];
                     const atividades = [];
-    
+
                     querySnapshot.forEach((doc) => {
                         const data = doc.data();
                         const descricao = data.descricao || data.sinopse;
-    
+
                         if (data.categoria === "livro") livros.push({ ...data, descricao });
                         else if (data.categoria === "filme") filmes.push({ ...data, descricao });
                         else if (data.categoria === "atividade") atividades.push({ ...data, descricao });
                     });
-    
+
                     renderItens(container, "Livros", livros);
                     renderItens(container, "Filmes", filmes);
                     renderItens(container, "Atividades", atividades);
@@ -155,34 +123,7 @@
                     container.innerHTML += "<p>Erro ao carregar os conteúdos.</p>";
                 }
             }
-    
-            
-            // Renderização de artigos no container
-            function renderArtigos(container, titulo, artigos) {
-    if (artigos.length === 0) return;
-
-    let html = `<h3>${titulo}</h3><ul>`;
-    artigos.forEach((artigo) => {
-        const conteudoResumido = artigo.conteudo
-            ? artigo.conteudo.substring(0, 150)
-            : "Conteúdo indisponível.";
-
-        html += `
-            <li>
-                <h4>${artigo.titulo}</h4>
-                <p><strong>Idades:</strong> ${artigo.idade.join(', ')}</p>
-                <p>${conteudoResumido}...</p>
-                <a href="detalhes-artigos.html?id=${artigo.id}" class="btn-default">Leia mais</a>
-            </li>
-        `;
-    });
-    html += `</ul>`;
-
-    container.innerHTML += html;
-}
-
-
-// Renderização de itens por faixa etária
+            // Renderização de itens por faixa etária
 function renderItens(container, titulo, itens) {
         if (itens.length === 0) return;
 
@@ -209,25 +150,85 @@ function renderItens(container, titulo, itens) {
         html += `</ul>`;
 
         container.innerHTML += html;
+        adicionarEventosVerMais();
 }
 
-    
 
-        // Função para adicionar eventos de "Ver mais" (se necessário)
-        function adicionarEventosVerMais() {
-            const verMaisBtns = document.querySelectorAll(".btn-default");
-            verMaisBtns.forEach(btn => {
-                btn.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    alert("Funcionalidade de 'Ver mais' em desenvolvimento.");
-                });
-            });
+
+
+            async function buscarArtigos(minIdade, maxIdade, artigosContainer) {
+                if (typeof db === 'undefined') {
+                    artigosContainer.innerHTML = "<p>Banco de dados não configurado.</p>";
+                    return;
+                }
+
+                const faixaIdades = Array.from({ length: maxIdade - minIdade + 1 }, (_, i) => i + minIdade);
+
+                try {
+                    const idadeQuery = await db
+                        .collection('artigos')
+                        .where('idade', 'array-contains-any', faixaIdades)
+                        .get();
+
+                    const artigosFiltrados = [];
+                    idadeQuery.forEach((doc) => {
+                        const artigo = doc.data();
+                        if (artigo.keywords && artigo.keywords.includes('educacao')) {
+                            artigosFiltrados.push({ id: doc.id, ...artigo });
+                        }
+                    });
+
+                    if (artigosFiltrados.length === 0) {
+                        artigosContainer.innerHTML = "<p>Nenhum artigo encontrado para esta faixa etária e palavra-chave.</p>";
+                    } else {
+                        artigosFiltrados.forEach((artigo) => {
+                            const titulo = artigo.titulo || "Título não disponível";
+                            const conteudo = artigo.conteudo || "Conteúdo não disponível";
+
+                            artigosContainer.innerHTML += `
+                        <div class="artigo" data-id="${artigo.id}">
+                            <h2>${titulo}</h2>
+                            <p><strong>Idades:</strong> ${artigo.idade.join(', ')}</p>
+                            <p>${conteudo.substring(0, 150)}...</p>
+                            <a href="detalhes-artigos.html?id=${artigo.id}" class="btn-default">Leia mais</a>
+                        </div>
+                    `;
+                        });
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar artigos:', error);
+                    artigosContainer.innerHTML = "<p>Erro ao carregar os artigos.</p>";
+                }
+            }
+            // Função para alternar a visibilidade da descrição
+    function toggleCollapse(event) {
+        const button = event.target;
+        const description = button.closest('.collapse-container').querySelector('.description');
+
+        if (description.classList.contains('visible')) {
+            description.classList.remove('visible');
+            button.textContent = "Ver mais";
+        } else {
+            description.classList.add('visible');
+            button.textContent = "Ver menos";
         }
+    }
+
+            // Adicionar eventos para "Ver mais"
+    function adicionarEventosVerMais() {
+        const buttons = document.querySelectorAll('.collapse-btn');
+        buttons.forEach((button) => {
+            button.addEventListener('click', toggleCollapse);
         });
-        
-        
+    }
+
+        });
+
+
+
+
     </script>
-    
+
 
 </body>
 

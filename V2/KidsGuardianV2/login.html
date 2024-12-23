@@ -27,7 +27,7 @@
                 <li class="nav-item active">
                     <a href="index.html">Inicio</a>
                 </li>
-                
+
             </ul>
 
 
@@ -62,8 +62,10 @@
             <input type="password" id="password" required>
             <button class="btn-default" type="submit">Entrar</button>
         </form>
+        <p><a href="#" id="forgotPasswordLink">Esqueci minha senha</a></p>
         <p>Não tem uma conta? <a href="signup.html">Cadastre-se aqui</a></p>
         <div id="loginError"></div>
+        <div id="resetPasswordMessage"></div>
     </div>
 
     <footer>
@@ -94,12 +96,12 @@
 
 
     <script>
-
+        // Lida com o envio do formulário de login
         document.getElementById('loginForm').addEventListener('submit', function (event) {
             event.preventDefault();
             var email = document.getElementById('email').value;
             var password = document.getElementById('password').value;
-
+    
             firebase.auth().signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     alert('Login realizado com sucesso!');
@@ -108,7 +110,7 @@
                 .catch((error) => {
                     const errorCode = error.code;
                     const errorMessage = error.message;
-
+    
                     if (errorCode === 'auth/wrong-password') {
                         document.getElementById('loginError').textContent = 'Senha incorreta.';
                     } else if (errorCode === 'auth/user-not-found') {
@@ -118,7 +120,35 @@
                     }
                 });
         });
+    
+        // Lida com o clique em "Esqueci minha senha"
+        document.getElementById('forgotPasswordLink').addEventListener('click', function (event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const messageDiv = document.getElementById('resetPasswordMessage');
+    
+            messageDiv.textContent = ''; // Limpa mensagens anteriores
+    
+            if (!email) {
+                messageDiv.textContent = 'Por favor, insira seu email para redefinir a senha.';
+                return;
+            }
+    
+            firebase.auth().sendPasswordResetEmail(email)
+                .then(() => {
+                    messageDiv.textContent = 'Um email para redefinição de senha foi enviado para ' + email + '.';
+                })
+                .catch((error) => {
+                    console.error('Erro ao enviar email de redefinição:', error);
+                    if (error.code === 'auth/user-not-found') {
+                        messageDiv.textContent = 'Email não encontrado. Verifique e tente novamente.';
+                    } else {
+                        messageDiv.textContent = 'Erro: ' + error.message;
+                    }
+                });
+        });
     </script>
+    
 </body>
 
 </html>
