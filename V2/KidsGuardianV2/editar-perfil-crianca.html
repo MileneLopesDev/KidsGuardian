@@ -19,6 +19,34 @@
             </ul>
             <button id="mobile_btn"><i class="fa-solid fa-bars"></i></button>
         </nav>
+        <div id="mobile_menu">
+            <ul id="mobile_nav_list">
+
+                <li class="nav-item"> <a href="index.html">Inicio</a> </li>
+
+                <li class="nav-item">  <a href="explorar.html">Explorar</a> </li>
+                
+                <li class="nav-item" id="mobile_loginNavItem">
+                    <a href="login.html">Login</a>
+                </li>
+                <li class="nav-item" id="mobile_paraVoceTab" style="display: none;">
+                    <a href="para-voce.html">Para Você</a>
+                </li>
+                <li class="nav-item" id="mobile_controlesParentais">
+                    <a href="controlesParentais.html">Controles Parentais</a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <div id="search-navbar">
+                        <input type="text" id="searchQuery" placeholder="Buscar artigos...">
+                        <button class="btn-default" id="searchButton">Buscar</button>
+                    </div>
+                </li>
+            </ul>
+
+
+        </div>
     </header>
 
     <main>
@@ -73,6 +101,9 @@
 
     <!-- Script Principal -->
     <script src="src/javascript/script.js"></script>
+    
+     <!-- Script menu mobile -->
+     <script src="src/javascript/menuMobile.js">  </script>
 
 
     <script>

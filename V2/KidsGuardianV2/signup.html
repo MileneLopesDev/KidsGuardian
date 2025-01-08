@@ -66,59 +66,63 @@
     <!-- Script Principal -->
     <script>
         document.getElementById('signupForm').addEventListener('submit', function (event) {
-            event.preventDefault();
+    event.preventDefault();
 
-            const name = document.getElementById('displayName').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const confirmPassword = document.getElementById('confirmPassword').value.trim();
-            const selectedCategory = document.querySelector('#categoria input:checked')?.value;
+    const name = document.getElementById('displayName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const confirmPassword = document.getElementById('confirmPassword').value.trim();
+    const selectedCategory = document.querySelector('#categoria input:checked')?.value;
 
-            const errorDiv = document.getElementById('signupError');
-            errorDiv.textContent = '';
+    const errorDiv = document.getElementById('signupError');
+    errorDiv.textContent = '';
 
-            if (!selectedCategory) {
-                errorDiv.textContent = 'Por favor, selecione uma categoria (Responsável ou Educador).';
-                return;
-            }
+    if (!selectedCategory) {
+        errorDiv.textContent = 'Por favor, selecione uma categoria (Responsável ou Educador).';
+        return;
+    }
 
-            if (password !== confirmPassword) {
-                errorDiv.textContent = 'As senhas não coincidem. Por favor, tente novamente.';
-                return;
-            }
+    if (password !== confirmPassword) {
+        errorDiv.textContent = 'As senhas não coincidem. Por favor, tente novamente.';
+        return;
+    }
 
-            firebase.auth().createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
 
-                    return user.updateProfile({ displayName: name }).then(() => {
-                        // Salva os dados do usuário no Firestore
-                        return firebase.firestore().collection('usuarios').doc(user.uid).set({
-                            nome: name,
-                            email: email,
-                            categorias: [selectedCategory] // Array para armazenar o tipo
-                        }).then(() => {
-                            alert('Conta criada com sucesso!');
-                            window.location.href = 'login.html';
-                        });
-                    });
-                })
-                .catch((error) => {
-                    console.error('Erro ao criar conta:', error);
-
-                    // Tratar o erro com base no código
-                    if (error.code === 'auth/email-already-in-use') {
-                        errorDiv.textContent = 'O email informado já está sendo utilizado. Por favor, use outro email.';
-                    } else if (error.code === 'auth/invalid-email') {
-                        errorDiv.textContent = 'O email informado é inválido. Por favor, tente novamente.';
-                    } else if (error.code === 'auth/weak-password') {
-                        errorDiv.textContent = 'A senha é muito fraca. Por favor, use pelo menos 6 caracteres.';
-                    } else {
-                        errorDiv.textContent = 'Erro ao criar conta: ' + error.message;
-                    }
+            return user.updateProfile({ displayName: name }).then(() => {
+                // Salva os dados do usuário no Firestore
+                return firebase.firestore().collection('usuarios').doc(user.uid).set({
+                    nome: name,
+                    email: email,
+                    categorias: [selectedCategory] // Array para armazenar o tipo
+                }).then(() => {
+                    alert('Conta criada com sucesso!');
+                    window.location.href = 'login.html';
                 });
+            });
+        })
+        .catch((error) => {
+            console.error('Erro ao criar conta:', error);
 
+            // Mapear os códigos de erro para mensagens amigáveis em português
+            switch (error.code) {
+                case 'auth/email-already-in-use':
+                    errorDiv.textContent = 'O endereço de email já está em uso por outra conta.';
+                    break;
+                case 'auth/weak-password':
+                    errorDiv.textContent = 'A senha é muito fraca. Use pelo menos 6 caracteres.';
+                    break;
+                case 'auth/invalid-email':
+                    errorDiv.textContent = 'O endereço de email não é válido.';
+                    break;
+                default:
+                    errorDiv.textContent = 'Erro ao criar conta. Tente novamente mais tarde.';
+            }
         });
+});
+
     </script>
 </body>
 

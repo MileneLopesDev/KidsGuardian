@@ -105,6 +105,10 @@
         align-items: center;
 
     }
+
+    #cta .title{
+        font-size: 3.8rem;
+    }
 }
 
 @media screen and (max-width: 450px){

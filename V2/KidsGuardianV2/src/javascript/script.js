@@ -380,3 +380,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+// voltar ao clicar na logo
+document.addEventListener("DOMContentLoaded", () => {
+    const logo = document.querySelector(".logo img"); // Seleciona a imagem da logo
+    if (logo) {
+        logo.addEventListener("click", () => {
+            window.location.href = "index.html"; // Redireciona para a página inicial
+        });
+    }
+});
+
