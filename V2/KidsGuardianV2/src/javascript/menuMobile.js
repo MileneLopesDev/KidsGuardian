@@ -1,6 +1,11 @@
 firebase.auth().onAuthStateChanged((user) => {
     const mobileLoginNavItem = document.getElementById("mobile_loginNavItem");
     const mobileLoginLink = mobileLoginNavItem.querySelector("a");
+    const mobileParaVoceTab = document.getElementById("mobile_paraVoceTab");
+    const mobileRecursosEducacionais = document.getElementById("mobile_recursosEducacionais");
+    // Elementos do menu mobile
+    const mobileSearchButton = document.getElementById("mobile_searchButton");
+    const mobileSearchQuery = document.getElementById("mobile_searchQuery");
 
     if (user) {
         const userId = user.uid;
@@ -9,58 +14,97 @@ firebase.auth().onAuthStateChanged((user) => {
         mobileLoginLink.textContent = userName;
         mobileLoginLink.href = "#";
 
-        // Criar submenu para o mobile
+        // Submenu para login
         const mobileSubMenu = document.createElement("ul");
         mobileSubMenu.className = "submenu";
 
-        // Adicionar "Editar Perfil"
+        // Adicionar editar perfil
         const editProfileItem = document.createElement("li");
         editProfileItem.innerHTML = `<a href="editar-perfil.html">Editar Perfil</a>`;
         mobileSubMenu.appendChild(editProfileItem);
 
-        // Carregar crianças cadastradas
-        db.collection("usuarios").doc(userId).collection("childrenProfiles").get()
-            .then((querySnapshot) => {
-                if (querySnapshot.empty) {
-                    console.log("Nenhum perfil de criança encontrado.");
-                } else {
-                    querySnapshot.forEach((childDoc) => {
-                        const child = childDoc.data();
-                        const childItem = document.createElement("li");
-                        childItem.innerHTML = `<a href="editar-perfil-crianca.html?id=${childDoc.id}">${child.name} (${child.age} anos)</a>`;
-                        mobileSubMenu.appendChild(childItem);
-                    });
-                }
+        db.collection("usuarios").doc(userId).get().then((doc) => {
+            const userData = doc.data();
+            const userType = userData?.categorias?.[0];
 
-                // Adicionar logout ao final
-                const logoutItem = document.createElement("li");
-                logoutItem.innerHTML = `<a href="#" id="logoutMobileButton">Logout</a>`;
-                mobileSubMenu.appendChild(logoutItem);
+            if (userType === "Responsável") {
+                // Mostrar aba "Para Você"
+                mobileParaVoceTab.style.display = "block";
 
-                // Logout no mobile
-                logoutItem.addEventListener("click", () => {
-                    firebase.auth().signOut().then(() => {
-                        alert("Você saiu.");
-                        window.location.href = "index.html";
+                // Adicionar perfil de crianças
+                db.collection("usuarios").doc(userId).collection("childrenProfiles").get()
+                    .then((querySnapshot) => {
+                        querySnapshot.forEach((childDoc) => {
+                            const child = childDoc.data();
+                            const childItem = document.createElement("li");
+                            childItem.innerHTML = `<a href="editar-perfil-crianca.html?id=${childDoc.id}">${child.name} (${child.age} anos)</a>`;
+                            mobileSubMenu.appendChild(childItem);
+                        });
                     });
+            } else if (userType === "Educador") {
+                // Mostrar recursos educacionais
+                mobileRecursosEducacionais.style.display = "block";
+
+                // Adicionar submenu de faixas etárias
+                const faixaEtariaMenu = document.createElement("ul");
+                faixaEtariaMenu.classList.add("submenu");
+
+                const faixasEtarias = [
+                    { idade: "0-2", titulo: "Bebês (0-2 anos)" },
+                    { idade: "3-5", titulo: "Crianças (3-5 anos)" },
+                    { idade: "6-10", titulo: "Crianças (6-10 anos)" },
+                    { idade: "11-18", titulo: "Adolescentes (11-18 anos)" },
+                ];
+
+                faixasEtarias.forEach((faixa) => {
+                    const faixaItem = document.createElement("li");
+                    faixaItem.innerHTML = `<a href="recursosEducacionais.html?idade=${faixa.idade}">${faixa.titulo}</a>`;
+                    faixaEtariaMenu.appendChild(faixaItem);
                 });
 
-                // Adicionar submenu ao item de login no mobile
-                mobileLoginNavItem.appendChild(mobileSubMenu);
+                mobileRecursosEducacionais.appendChild(faixaEtariaMenu);
+            }
+        });
 
-                // Lógica para mostrar/ocultar submenu ao clicar
-                let isSubMenuVisible = false;
-                mobileLoginLink.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    isSubMenuVisible = !isSubMenuVisible;
-                    mobileSubMenu.style.display = isSubMenuVisible ? "block" : "none";
-                });
-            })
-            .catch((error) => {
-                console.error("Erro ao carregar perfis de crianças:", error);
+        // Adicionar logout
+        const logoutItem = document.createElement("li");
+        logoutItem.innerHTML = `<a href="#" id="logoutMobileButton">Logout</a>`;
+        mobileSubMenu.appendChild(logoutItem);
+
+        logoutItem.addEventListener("click", () => {
+            firebase.auth().signOut().then(() => {
+                alert("Você saiu.");
+                window.location.href = "index.html";
             });
+        });
+
+        // Lógica de submenu
+        mobileLoginLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            const isVisible = mobileSubMenu.style.display === "block";
+            mobileSubMenu.style.display = isVisible ? "none" : "block";
+        });
+
+        mobileLoginNavItem.appendChild(mobileSubMenu);
     } else {
         mobileLoginLink.textContent = "Login";
         mobileLoginLink.href = "login.html";
+
+        // Ocultar itens específicos de usuário
+        mobileParaVoceTab.style.display = "none";
+        mobileRecursosEducacionais.style.display = "none";
     }
+
+    // Lógica para o botão de pesquisa mobile
+    if (mobileSearchButton && mobileSearchQuery) {
+        mobileSearchButton.addEventListener("click", () => {
+            const searchQuery = mobileSearchQuery.value.trim(); // Captura o valor da pesquisa
+            if (searchQuery) {
+                // Redireciona para a página de resultados com o termo de busca
+                window.location.href = `pesquisa.html?q=${encodeURIComponent(searchQuery)}`;
+            } else {
+                alert("Por favor, insira um termo para pesquisar.");
+            }
+        });}
 });
+
